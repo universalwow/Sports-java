@@ -10,11 +10,11 @@ import lombok.Data;
 import java.util.List;
 
 enum SportClass {
-    Counter, Timer, TimerCounter, None
+    Counter, Timer, TimeCounter, None
 }
 
 enum SportPeriod {
-    None, CompletePeriod, HarfPeriod, Continue, Discrete
+    None, CompletePeriod, HarfPeriod, Continuous, Discrete
 }
 
 @Data
