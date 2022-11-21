@@ -1,16 +1,11 @@
 package com.astra.actionconfig.utils;
 
-<<<<<<< HEAD
+
 import com.alibaba.fastjson.JSONObject;
 import com.astra.actionconfig.config.Sport;
 import com.astra.actionconfig.config.SportState;
 import com.astra.actionconfig.config.data.PngImage;
-=======
-import com.alibaba.fastjson2.JSON;
-import com.astra.actionconfig.config.MainConfig;
-import com.astra.actionconfig.config.State;
-import com.astra.actionconfig.config.data.Image;
->>>>>>> 0db6365e64942eeb39bdbd71c8bf6a3fabcbaf56
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StopWatch;
