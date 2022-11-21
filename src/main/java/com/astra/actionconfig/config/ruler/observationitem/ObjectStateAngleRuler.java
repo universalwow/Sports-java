@@ -1,7 +1,7 @@
 package com.astra.actionconfig.config.ruler.observationitem;
 
-import com.astra.actionconfig.config.data.landmarkd.LandmarkPositionArea;
-import com.astra.actionconfig.config.data.state.WarningState;
+import com.astra.actionconfig.config.data.Warning;
+import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import lombok.Data;
 
 @Data
@@ -12,10 +12,10 @@ public class ObjectStateAngleRuler {
     public double lowerBound = -3;
     public double upperBound = 0;
     public int toStateId = 0;
-    public WarningState warning;
+    public Warning warning;
 
-    public LandmarkPositionArea fromPosition;
-    public LandmarkPositionArea toPosition;
+    public ObjectPositionPoint fromPosition;
+    public ObjectPositionPoint toPosition;
 
     /*
     {

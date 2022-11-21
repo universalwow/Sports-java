@@ -5,9 +5,10 @@ import lombok.Data;
 
 @Data
 public class LandmarkSegment {
+
     public ColorState color = new ColorState();
     public Boolean selected = false;
-    public LandmarkPosition startLandmark;
-    public LandmarkPosition endLandmark;
+    public Landmark startLandmark;
+    public Landmark endLandmark;
 
 }

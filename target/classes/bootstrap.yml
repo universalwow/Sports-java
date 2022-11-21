@@ -1,0 +1,13 @@
+server:
+  port: 8093
+
+# Spring
+spring: 
+  application:
+    name: config-algorithm
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB

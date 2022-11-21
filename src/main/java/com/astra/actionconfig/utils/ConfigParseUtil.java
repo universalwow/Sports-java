@@ -1,9 +1,9 @@
 package com.astra.actionconfig.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.astra.actionconfig.config.MainConfig;
-import com.astra.actionconfig.config.State;
-import com.astra.actionconfig.config.data.Image;
+import com.astra.actionconfig.config.Sport;
+import com.astra.actionconfig.config.SportState;
+import com.astra.actionconfig.config.data.PngImage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,17 +34,17 @@ public class ConfigParseUtil {
             log.error("parseConfig error, {}", ex.getMessage());
         }
 
-        MainConfig mainConfig = JSONObject.parseObject(sb.toString(), MainConfig.class);
+        Sport sport = JSONObject.parseObject(sb.toString(), Sport.class);
 
-        List<State> states = mainConfig.getStates();
+        List<SportState> states = sport.getStates();
         states.forEach(state -> {
-            Image image = state.getImage();
+            PngImage image = state.getImage();
             if (Objects.nonNull(image) && StringUtils.isNotBlank(image.getPhoto())) {
                 image.setPhoto("");
             }
         });
 
-        log.info("[MainConfig entity]---, {}", mainConfig);
+        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
     }
 
     public static void main(String[] args) {

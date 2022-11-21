@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class LandmarkSegmentToAxis {
-    public String axis = "X";
+    public CoordinateAxis axis;
     public LandmarkSegment landmarkSegment;
 
 }

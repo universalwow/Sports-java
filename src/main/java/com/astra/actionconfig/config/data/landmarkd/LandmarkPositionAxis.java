@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class LandmarkPositionAxis {
     public String axis = "";//关节点
-    public LandmarkPosition landmark;
+    public Landmark landmark;
     /*
         "axis": "X",
     "landmark": {

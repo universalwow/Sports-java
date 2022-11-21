@@ -1,9 +1,9 @@
 package com.astra.actionconfig.config.ruler.observationitem;
 
-import com.astra.actionconfig.config.data.ObjectLabel;
-import com.astra.actionconfig.config.data.landmarkd.LandmarkPositionArea;
+import com.astra.actionconfig.config.data.Observation;
+import com.astra.actionconfig.config.data.Warning;
+import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
-import com.astra.actionconfig.config.data.state.WarningState;
 import lombok.Data;
 
 @Data
@@ -15,12 +15,12 @@ public class ObjectStateDistanceRuler {
     public double lowerBound = -3;
     public double upperBound = 0;
     public int toStateId = 0;
-    public WarningState warning;
+    public Warning warning;
 
-    public ObjectLabel object;
+    public Observation object;
 
-    public LandmarkPositionArea fromPosition;
-    public LandmarkPositionArea toPosition;
+    public ObjectPositionPoint fromPosition;
+    public ObjectPositionPoint toPosition;
     public LandmarkSegmentToAxis toLandmarkSegmentToAxis;
 
     /*

@@ -6,8 +6,8 @@ import java.util.List;
 
 @Data
 public class HumanPose {
-    public String id = "";//编号
+    public int id;//编号
     public List<LandmarkSegment> landmarkSegments;
-    public List<LandmarkPosition> landmarks;
+    public List<Landmark> landmarks;
 
 }
