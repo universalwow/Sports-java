@@ -6,11 +6,13 @@ import lombok.Data;
 
 @Data
 public class AngleToLandmarkSegment {
+    public LandmarkSegment from;
+    public LandmarkSegment to;
     public String id;
-    public LandmarkSegment landmarkSegment;
-    public double lowerBound = 0f;
+    public double lowerBound = 0;
     public double upperBound = 0;
     public Warning warning;
+
     /*
          "id": "03D11A27-9749-4297-939B-5A906F05714F",
         "landmarkSegment": {

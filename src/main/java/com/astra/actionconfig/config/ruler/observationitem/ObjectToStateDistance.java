@@ -8,8 +8,8 @@ import lombok.Data;
 
 @Data
 public class ObjectToStateDistance {
-    public String extremeDirection = "MaxX";
-    public String id = "";
+    public ExtremeDirection extremeDirection;
+    public String id;
     public Boolean isRelativeToExtremeDirection = false;
     public Boolean isRelativeToObject = false;
     public double lowerBound = -3;

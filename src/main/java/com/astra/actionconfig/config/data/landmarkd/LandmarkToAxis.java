@@ -3,8 +3,8 @@ package com.astra.actionconfig.config.data.landmarkd;
 import lombok.Data;
 
 @Data
-public class LandmarkPositionAxis {
-    public String axis = "";//关节点
+public class LandmarkToAxis {
+    public CoordinateAxis axis;//关节点
     public Landmark landmark;
     /*
         "axis": "X",

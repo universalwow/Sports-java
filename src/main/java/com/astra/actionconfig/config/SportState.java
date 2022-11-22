@@ -20,6 +20,8 @@ public class SportState {
     public int checkCycle = 1;
     public int keepTime = 5;
     public float passingRate = 0.8f;
+    public Optional<Integer> directToStateId;
+    public Optional<Double> transFormTimeLimit;
 
     public List<LandmarkSegment> landmarkSegments;
 

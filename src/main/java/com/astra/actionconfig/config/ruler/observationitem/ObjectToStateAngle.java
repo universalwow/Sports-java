@@ -5,13 +5,6 @@ import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import lombok.Data;
 
 
-enum ExtremeDirection {
-    MinX, MinY,
-    MaxX, MaxY,
-    MinX_MinY, MinX_MaxY,
-    MaxX_MinY, MaxX_MaxY
-}
-
 @Data
 public class ObjectToStateAngle {
     public ExtremeDirection extremeDirection;

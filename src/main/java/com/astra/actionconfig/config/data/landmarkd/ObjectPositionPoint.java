@@ -11,10 +11,6 @@ enum ObjectPosition {
 }
 
 
-enum CoordinateAxis {
-    X, Y, XY
-}
-
 @Data
 public class ObjectPositionPoint {
     public CoordinateAxis axis;

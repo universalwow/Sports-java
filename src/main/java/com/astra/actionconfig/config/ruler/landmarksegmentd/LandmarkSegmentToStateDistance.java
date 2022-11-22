@@ -1,13 +1,15 @@
 package com.astra.actionconfig.config.ruler.landmarksegmentd;
 
 import com.astra.actionconfig.config.data.Warning;
+import com.astra.actionconfig.config.data.landmarkd.CoordinateAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
+import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
 
 @Data
 public class LandmarkSegmentToStateDistance {
-    public String extremeDirection = "MinX_MinY";
-    public String fromAxis = "XY";
+    public ExtremeDirection extremeDirection;
+    public CoordinateAxis fromAxis;
     public String id = "";
     public Boolean isRelativeToExtremeDirection = true;
     public double lowerBound = 0;

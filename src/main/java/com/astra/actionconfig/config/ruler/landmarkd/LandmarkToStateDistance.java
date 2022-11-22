@@ -1,22 +1,23 @@
 package com.astra.actionconfig.config.ruler.landmarkd;
 
 import com.astra.actionconfig.config.data.Warning;
-import com.astra.actionconfig.config.data.landmarkd.LandmarkPositionAxis;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkToAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
+import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
 
 @Data
 public class LandmarkToStateDistance {
     public String id = "";
-    public Boolean isRelativeToExtremeDirection = true;
+    public Boolean isRelativeToExtremeDirection;
     public double lowerBound = 0;
     public int toStateId = 0;
     public double upperBound = 0;
-    public String extremeDirection = "MaxX";
+    public ExtremeDirection extremeDirection;
     public Boolean defaultSatisfy = true;
-    public LandmarkPositionAxis fromLandmarkToAxis;
+    public LandmarkToAxis fromLandmarkToAxis;
     public LandmarkSegmentToAxis toLandmarkSegmentToAxis;
-    public LandmarkPositionAxis toLandmarkToAxis;
+    public LandmarkToAxis toLandmarkToAxis;
     public Warning warning;
 
     /*

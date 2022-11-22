@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class LandmarkSegmentAngle {
-    public LandmarkSegment from;
-    public LandmarkSegment to;
+
     public String id;
-    public double lowerBound = 0;
+    public LandmarkSegment landmarkSegment;
+    public double lowerBound = 0f;
     public double upperBound = 0;
     public Warning warning;
     /*

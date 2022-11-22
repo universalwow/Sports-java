@@ -2,13 +2,14 @@ package com.astra.actionconfig.config.ruler.landmarkd;
 
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.Landmark;
+import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
 
 @Data
 public class LandmarkToStateAngle {
-    public String id = "";
-    public Boolean isRelativeToExtremeDirection = true;
-    public String extremeDirection = "MinX";
+    public String id;
+    public Boolean isRelativeToExtremeDirection;
+    public ExtremeDirection extremeDirection;
     public double lowerBound = 0;
     public int toStateId = 0;
     public double upperBound = 0;

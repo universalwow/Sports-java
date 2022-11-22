@@ -3,7 +3,7 @@ package com.astra.actionconfig.config;
 import com.astra.actionconfig.config.data.DynamicArea;
 import com.astra.actionconfig.config.data.FixedArea;
 import com.astra.actionconfig.config.data.Question;
-import com.astra.actionconfig.config.data.state.TransFormState;
+import com.astra.actionconfig.config.data.state.SportStateTransform;
 import com.astra.actionconfig.config.data.state.ViolateStateSequence;
 import lombok.Data;
 
@@ -47,7 +47,7 @@ public class Sport {
     public List<List<Integer>> scoreStateSequence; // 含义待定
 
     //下面是状态的定义
-    public List<TransFormState> stateTransForm; // 含义待定
+    public List<SportStateTransform> stateTransForm; // 含义待定
     public List<ViolateStateSequence> violateStateSequence; // 含义待定
     public List<SportState> states; // 含义待定
 

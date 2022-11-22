@@ -2,13 +2,14 @@ package com.astra.actionconfig.config.ruler.landmarksegmentd;
 
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
+import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
 
 @Data
 public class LandmarkSegmentToStateAngle {
     public String id = "";
     public Boolean isRelativeToExtremeDirection = true;
-    public String extremeDirection = "MinX_MinY";
+    public ExtremeDirection extremeDirection = ExtremeDirection.MinX;
     public double lowerBound = 0;
     public int toStateId = 0;
     public double upperBound = 0;
