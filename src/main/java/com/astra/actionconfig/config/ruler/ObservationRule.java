@@ -1,8 +1,9 @@
 package com.astra.actionconfig.config.ruler;
 
+import com.astra.actionconfig.config.ruler.observationitem.ObjectToLandmark;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToObject;
-import com.astra.actionconfig.config.ruler.observationitem.ObjectStateAngleRuler;
-import com.astra.actionconfig.config.ruler.observationitem.ObjectStateDistanceRuler;
+import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateAngle;
+import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateDistance;
 import lombok.Data;
 
 import java.util.List;
@@ -19,10 +20,10 @@ public class ObservationRule {
     public ObjectLabel objectLabel;
     public RuleClass ruleClass = RuleClass.Observation;
 
-    public List<ObjectToObject> objectToLandmark;
+    public List<ObjectToLandmark> objectToLandmark;
     public List<ObjectToObject> objectToObject;
-    public List<ObjectStateAngleRuler> objectToStateAngle;
+    public List<ObjectToStateAngle> objectToStateAngle;
 
-    public List<ObjectStateDistanceRuler> objectToStateDistance;
+    public List<ObjectToStateDistance> objectToStateDistance;
 
 }

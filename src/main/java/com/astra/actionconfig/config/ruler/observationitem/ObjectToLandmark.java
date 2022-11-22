@@ -3,18 +3,18 @@ package com.astra.actionconfig.config.ruler.observationitem;
 import com.astra.actionconfig.config.data.Observation;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.Landmark;
-import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
+import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import lombok.Data;
 
 @Data
-public class ObjectToObject {
+public class ObjectToLandmark {
     public String id;
     public Boolean isRelativeToObject;
     public double lowerBound;
     public double upperBound;
     public ObjectPositionPoint fromPosition;
-    public ObjectPositionPoint toPosition;
+    public Landmark toLandmark;
     public Observation object;
     public Warning warning;
     public LandmarkSegmentToAxis toLandmarkSegmentToAxis;

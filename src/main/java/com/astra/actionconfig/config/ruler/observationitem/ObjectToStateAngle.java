@@ -4,14 +4,22 @@ import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.ObjectPositionPoint;
 import lombok.Data;
 
+
+enum ExtremeDirection {
+    MinX, MinY,
+    MaxX, MaxY,
+    MinX_MinY, MinX_MaxY,
+    MaxX_MinY, MaxX_MaxY
+}
+
 @Data
-public class ObjectStateAngleRuler {
-    public String extremeDirection = "MinX";
-    public String id = "";
-    public Boolean isRelativeToExtremeDirection = false;
-    public double lowerBound = -3;
-    public double upperBound = 0;
-    public int toStateId = 0;
+public class ObjectToStateAngle {
+    public ExtremeDirection extremeDirection;
+    public String id;
+    public Boolean isRelativeToExtremeDirection;
+    public double lowerBound;
+    public double upperBound;
+    public int toStateId;
     public Warning warning;
 
     public ObjectPositionPoint fromPosition;

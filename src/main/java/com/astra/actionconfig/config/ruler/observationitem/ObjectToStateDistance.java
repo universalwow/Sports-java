@@ -7,7 +7,7 @@ import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
 import lombok.Data;
 
 @Data
-public class ObjectStateDistanceRuler {
+public class ObjectToStateDistance {
     public String extremeDirection = "MaxX";
     public String id = "";
     public Boolean isRelativeToExtremeDirection = false;

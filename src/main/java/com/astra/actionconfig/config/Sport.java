@@ -1,6 +1,6 @@
 package com.astra.actionconfig.config;
 
-import com.astra.actionconfig.config.data.Area;
+import com.astra.actionconfig.config.data.DynamicArea;
 import com.astra.actionconfig.config.data.FixedArea;
 import com.astra.actionconfig.config.data.Question;
 import com.astra.actionconfig.config.data.state.TransFormState;
@@ -46,7 +46,7 @@ public class Sport {
 
     //下面是动态区域定义
     public int dynamicAreaNumber = 3; //动态区域数量
-    public List<Area> dynamicAreas; // 含义待定
+    public List<DynamicArea> dynamicAreas; // 含义待定
     public List<FixedArea> fixedAreas; // 固定区域
 
     //下面是交互方式的描述
