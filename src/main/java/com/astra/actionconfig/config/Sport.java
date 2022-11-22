@@ -8,6 +8,7 @@ import com.astra.actionconfig.config.data.state.ViolateStateSequence;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 
 enum SportClass {
     Counter, Timer, TimeCounter, None
@@ -15,6 +16,12 @@ enum SportClass {
 
 enum SportPeriod {
     None, CompletePeriod, HarfPeriod, Continuous, Discrete
+}
+
+enum InteractionType {
+    None,
+    SingleChoice, MultipleChoice,
+    SingleTouch, OrdinalTouch
 }
 
 @Data
@@ -50,8 +57,8 @@ public class Sport {
     public List<FixedArea> fixedAreas; // 固定区域
 
     //下面是交互方式的描述
-    public String interactionType = "";  //出现值 "None",此处不确定是否为对象
-    public int interactionScoreCycle = 1;  //
+    public InteractionType interactionType;  //出现值 "None",此处不确定是否为对象
+    public Optional<Integer> interactionScoreCycle;  //
 
     //下面这个，没有数据，暂时不清楚其格式
     public List<List<Integer>> interactionScoreStateSequence; // 含义待定
