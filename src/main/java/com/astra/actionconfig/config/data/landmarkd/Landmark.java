@@ -2,6 +2,7 @@ package com.astra.actionconfig.config.data.landmarkd;
 
 import com.astra.actionconfig.config.data.ColorState;
 import com.astra.actionconfig.config.data.Point3F;
+import com.astra.actionconfig.config.data.Vector2D;
 import lombok.Data;
 
 @Data
@@ -16,4 +17,6 @@ public class Landmark {
         this.landmarkType = landmarkType;
         this.position = position;
     }
+
+
 }

@@ -2,7 +2,6 @@ package com.astra.actionconfig.config.ruler.landmarkd;
 
 import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
-import com.astra.actionconfig.config.data.landmarkd.CoordinateAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
@@ -30,7 +29,7 @@ public class DistanceToLandmark {
                 this.from.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
         LandmarkSegment toSegment =
                 this.to.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
-        
+
         return ComplexRule.satisfyWithDirection(from.axis, to.axis, this.range(), fromSegment, toSegment);
     }
 }
