@@ -7,7 +7,13 @@ import lombok.Data;
 @Data
 public class Landmark {
     public LandmarkType landmarkType;//关节点
-    public ColorState color;
+    public ColorState color = new ColorState();
     public Point3F position;
     public Boolean selected = false;
+
+
+    public Landmark(LandmarkType landmarkType, Point3F position) {
+        this.landmarkType = landmarkType;
+        this.position = position;
+    }
 }

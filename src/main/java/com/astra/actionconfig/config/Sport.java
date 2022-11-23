@@ -68,6 +68,6 @@ public class Sport {
     public List<String> selectedLandmarkTypes; //
 
     public List<Question> questions; //
-    
+
 
 }
