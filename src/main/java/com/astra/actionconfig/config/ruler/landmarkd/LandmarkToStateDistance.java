@@ -1,10 +1,17 @@
 package com.astra.actionconfig.config.ruler.landmarkd;
 
+import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
-import com.astra.actionconfig.config.data.landmarkd.LandmarkToAxis;
-import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
+import com.astra.actionconfig.config.data.landmarkd.*;
+import com.astra.actionconfig.config.ruler.StateTime;
 import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
+import org.apache.commons.lang3.Range;
+
+import java.lang.reflect.Array;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class LandmarkToStateDistance {
@@ -14,103 +21,79 @@ public class LandmarkToStateDistance {
     public int toStateId = 0;
     public double upperBound = 0;
     public ExtremeDirection extremeDirection;
-    public Boolean defaultSatisfy = true;
+    public Boolean defaultSatisfy = false;
     public LandmarkToAxis fromLandmarkToAxis;
     public LandmarkSegmentToAxis toLandmarkSegmentToAxis;
     public LandmarkToAxis toLandmarkToAxis;
     public Warning warning;
 
-    /*
-     {
-        "defaultSatisfy": true,
-        "extremeDirection": "MaxX",
-        "fromLandmarkToAxis": {
-            "axis": "X",
-            "landmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftAnkle",
-                "position": {
-                    "x": 895.2235107421875,
-                    "y": 848.5889892578125,
-                    "z": 283.5280456542969
-                },
-                "selected": true
-            }
-        },
-        "id": "A13E81B5-EF1B-4D81-A4AD-8C8499BE8F63",
-        "isRelativeToExtremeDirection": true,
-        "lowerBound": 0,
-        "toLandmarkSegmentToAxis": {
-            "axis": "X",
-            "landmarkSegment": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "endLandmark": {
-                    "color": {
-                        "blue": 0.9999999403953552,
-                        "green": 0.9999999403953552,
-                        "red": 0.9999999403953552
-                    },
-                    "landmarkType": "RightShoulder",
-                    "position": {
-                        "x": 979.5059814453125,
-                        "y": 406.466796875,
-                        "z": -89.5245590209961
-                    },
-                    "selected": false
-                },
-                "selected": false,
-                "startLandmark": {
-                    "color": {
-                        "blue": 0.9999999403953552,
-                        "green": 0.9999999403953552,
-                        "red": 0.9999999403953552
-                    },
-                    "landmarkType": "LeftShoulder",
-                    "position": {
-                        "x": 856.8896484375,
-                        "y": 409.37396240234375,
-                        "z": -93.81895446777344
-                    },
-                    "selected": false
+    public Range<Double> range() {
+        return Range.between(lowerBound, upperBound);
+    }
+
+    public boolean satisfy(List<StateTime> stateTimeHistory, Map<LandmarkType, Point3F> poseMap) {
+        List<StateTime> toStateTimes = stateTimeHistory.
+                stream().
+                filter(stateTime -> stateTime.stateId == this.toStateId).collect(Collectors.toList());
+        if (toStateTimes.size() > 0) {
+            StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
+            Landmark fromLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(poseMap);
+            Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F());
+
+            if (isRelativeToExtremeDirection) {
+                switch (extremeDirection) {
+
+                    case MinX:
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX;
+                        break;
+                    case MinY:
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY;
+
+                        break;
+                    case MaxX:
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX;
+
+                        break;
+                    case MaxY:
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY;
+
+                        break;
+                    case MinX_MinY:
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY.y;
+
+                        break;
+                    case MinX_MaxY:
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY.y;
+
+                        break;
+                    case MaxX_MinY:
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY.y;
+
+                        break;
+                    case MaxX_MaxY:
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY.y;
+
+                        break;
                 }
+
+            }else {
+                toLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(toStateTime.poseMap);
             }
-        },
-        "toLandmarkToAxis": {
-            "axis": "X",
-            "landmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftAnkle",
-                "position": {
-                    "x": 895.2235107421875,
-                    "y": 848.5889892578125,
-                    "z": 283.5280456542969
-                },
-                "selected": true
-            }
-        },
-        "toStateId": 7,
-        "upperBound": 0,
-        "warning": {
-            "changeStateClear": true,
-            "content": "",
-            "delayTime": 2,
-            "isScoreWarning": true,
-            "triggeredWhenRuleMet": true
+
+            LandmarkSegment fromSegment = new LandmarkSegment(fromLandmark, toLandmark);
+            LandmarkSegment toSegment = this.toLandmarkSegmentToAxis.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+
+            return ComplexRule.satisfyWithDirection(fromLandmarkToAxis.axis, toLandmarkSegmentToAxis.axis, this.range(), fromSegment, toSegment);
+        }else {
+            return defaultSatisfy;
         }
+
+
     }
 
 
-     */
 }

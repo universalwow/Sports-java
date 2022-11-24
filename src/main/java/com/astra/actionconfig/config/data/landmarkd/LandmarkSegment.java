@@ -2,6 +2,7 @@ package com.astra.actionconfig.config.data.landmarkd;
 
 import com.astra.actionconfig.config.data.ColorState;
 import com.astra.actionconfig.config.data.Point3F;
+import com.astra.actionconfig.config.data.Vector2D;
 import lombok.Data;
 
 import java.util.Map;
@@ -25,6 +26,10 @@ public class LandmarkSegment {
 
     public LandmarkTypeSegment landmarkTypeSegment() {
         return new LandmarkTypeSegment(startLandmark.landmarkType, endLandmark.landmarkType);
+    }
+
+    public double angle() {
+        return Vector2D.minus(endLandmark.position.vector2D(), startLandmark.position.vector2D()).oppositeY().angle();
     }
 
     public double distanceX() {

@@ -1,5 +1,10 @@
 package com.astra.actionconfig.config.data.landmarkd;
 
+import com.astra.actionconfig.config.data.Point3F;
+
+import java.awt.*;
+import java.util.Map;
+
 public enum LandmarkType {
     Nose,
     LeftEyeOuter, LeftEye, LeftEyeInner,
@@ -17,5 +22,10 @@ public enum LandmarkType {
     LeftAnkle, RightAnkle,
     LeftHeel, RightHeel,
     LeftToe, RightToe,
-    None
+    None;
+
+    public Landmark landmark(Map<LandmarkType, Point3F> poseMap) {
+        Point3F point = poseMap.get(this);
+        return new Landmark(this, point);
+    }
 }

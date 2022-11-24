@@ -17,31 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class ExtremeObject {
-    public Observation minX;
-    public Observation maxX;
-    public Observation minY;
-    public Observation maxY;
-}
-
-class ExtremePoint3D {
-    public Point3F minX;
-    public Point3F maxX;
-    public Point3F minY;
-    public Point3F maxY;
-}
-
-class StateTime {
-    public int stateId;
-    public double time;
-    public Map<LandmarkType, Point3F> poseMap;
-    public Option<Observation> object;
-    public Map<String, ExtremeObject> dynamicObjectsMaps;
-    public Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps;
-
-
-}
-
 
 class RuleSatisfyData {
     public boolean satisfy;

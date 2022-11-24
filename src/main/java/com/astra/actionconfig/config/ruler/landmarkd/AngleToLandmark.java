@@ -1,8 +1,14 @@
 package com.astra.actionconfig.config.ruler.landmarkd;
 
+import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.Landmark;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import lombok.Data;
+import org.apache.commons.lang3.Range;
+
+import java.util.Map;
 
 @Data
 public class AngleToLandmark {
@@ -12,46 +18,24 @@ public class AngleToLandmark {
     public double lowerBound = 0;
     public double upperBound = 0;
     public Warning warning;
-    /*
-    {
-        "fromLandmark": {
-            "color": {
-                "blue": 0.9999999403953552,
-                "green": 0.9999999403953552,
-                "red": 0.9999999403953552
-            },
-            "landmarkType": "LeftAnkle",
-            "position": {
-                "x": 895.2235107421875,
-                "y": 848.5889892578125,
-                "z": 283.5280456542969
-            },
-            "selected": true
-        },
-        "id": "B556710B-CFB5-478A-A7D8-3AD57A0B478C",
-        "lowerBound": 0,
-        "toLandmark": {
-            "color": {
-                "blue": 0.9999999403953552,
-                "green": 0.9999999403953552,
-                "red": 0.9999999403953552
-            },
-            "landmarkType": "LeftAnkle",
-            "position": {
-                "x": 895.2235107421875,
-                "y": 848.5889892578125,
-                "z": 283.5280456542969
-            },
-            "selected": true
-        },
-        "upperBound": 0,
-        "warning": {
-            "changeStateClear": true,
-            "content": "",
-            "delayTime": 2,
-            "isScoreWarning": true,
-            "triggeredWhenRuleMet": false
-        }
+
+    public LandmarkSegment landmarkSegment() {
+        return new LandmarkSegment(toLandmark, fromLandmark);
     }
-     */
+
+    public Range<Double> range() {
+        if (lowerBound < upperBound) {
+            return Range.between(lowerBound, upperBound);
+        }else{
+            return Range.between(lowerBound, upperBound + 360);
+        }
+
+    }
+
+    public boolean satisfy(Map<LandmarkType, Point3F> poseMap) {
+        Range<Double> range = this.range();
+        LandmarkSegment segment = this.landmarkSegment().landmarkTypeSegment().landmarkSegment(poseMap);
+        return range.contains(segment.angle()) || range.contains(segment.angle() + 360);
+    }
+
 }
