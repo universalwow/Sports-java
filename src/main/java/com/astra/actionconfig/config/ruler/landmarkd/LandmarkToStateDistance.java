@@ -3,12 +3,12 @@ package com.astra.actionconfig.config.ruler.landmarkd;
 import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.*;
+import com.astra.actionconfig.config.ruler.ComplexRule;
 import com.astra.actionconfig.config.ruler.StateTime;
 import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
 import org.apache.commons.lang3.Range;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,7 +42,6 @@ public class LandmarkToStateDistance {
 
             if (isRelativeToExtremeDirection) {
                 switch (extremeDirection) {
-
                     case MinX:
                         toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX;
                         break;

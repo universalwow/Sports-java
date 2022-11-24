@@ -5,6 +5,7 @@ import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentToAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.astra.actionconfig.config.ruler.ComplexRule;
 import lombok.Data;
 import org.apache.commons.lang3.Range;
 

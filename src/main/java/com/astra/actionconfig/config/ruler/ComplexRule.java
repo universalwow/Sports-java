@@ -1,4 +1,4 @@
-package com.astra.actionconfig.config.ruler.landmarkd;
+package com.astra.actionconfig.config.ruler;
 
 import com.astra.actionconfig.config.data.landmarkd.CoordinateAxis;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
