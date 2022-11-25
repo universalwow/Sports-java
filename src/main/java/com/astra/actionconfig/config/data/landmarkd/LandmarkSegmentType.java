@@ -1,4 +1,4 @@
-package com.astra.actionconfig.config.ruler.landmarksegmentd;
+package com.astra.actionconfig.config.data.landmarkd;
 
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import lombok.Data;

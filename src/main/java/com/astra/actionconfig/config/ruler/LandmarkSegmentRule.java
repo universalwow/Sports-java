@@ -1,5 +1,6 @@
 package com.astra.actionconfig.config.ruler;
 
+import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentType;
 import com.astra.actionconfig.config.ruler.landmarksegmentd.*;
 import lombok.Data;
 
@@ -15,12 +16,6 @@ public class LandmarkSegmentRule {
     public List<LandmarkSegmentLength> landmarkSegmentLength;
     public List<LandmarkSegmentToStateAngle> landmarkSegmentToStateAngle;
     public List<LandmarkSegmentToStateDistance> landmarkSegmentToStateDistance;
-    /*
-angleToLandmarkSegment[
-landmarkSegmentAngle[
-landmarkSegmentLength[
-landmarkSegmentToStateAngle[
-landmarkSegmentToStateDistance[
-     */
+
 }
 

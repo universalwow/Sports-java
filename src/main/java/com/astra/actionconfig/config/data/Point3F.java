@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class Point3F {
-    public float x;
-    public float y;
-    public float z;
+    public double x;
+    public double y;
+    public double z;
 
     public Vector2D vector2D() {
         return new Vector2D(this.x, this.y);

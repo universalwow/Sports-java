@@ -1,10 +1,20 @@
 package com.astra.actionconfig.config.ruler.landmarksegmentd;
 
+import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.CoordinateAxis;
+import com.astra.actionconfig.config.data.landmarkd.Landmark;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.astra.actionconfig.config.ruler.ComplexRule;
+import com.astra.actionconfig.config.ruler.StateTime;
 import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import lombok.Data;
+import org.apache.commons.lang3.Range;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class LandmarkSegmentToStateDistance {
@@ -20,96 +30,95 @@ public class LandmarkSegmentToStateDistance {
 
     public Warning warning;
 
-    /*
-    {
-        "extremeDirection": "MinX_MinY",
-        "fromAxis": "XY",
-        "fromLandmarkSegment": {
-            "color": {
-                "blue": 0.9999999403953552,
-                "green": 0.4784314036369324,
-                "red": 0
-            },
-            "endLandmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftAnkle",
-                "position": {
-                    "x": 895.2235107421875,
-                    "y": 848.5889892578125,
-                    "z": 283.5280456542969
-                },
-                "selected": false
-            },
-            "selected": true,
-            "startLandmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftKnee",
-                "position": {
-                    "x": 886.864501953125,
-                    "y": 732.7236328125,
-                    "z": -2.663571834564209
-                },
-                "selected": false
+    public Range<Double> range() {
+        return Range.between(lowerBound, upperBound);
+    }
+
+    public boolean satisfy(List<StateTime> stateTimeHistory, Map<LandmarkType, Point3F> poseMap) {
+        List<StateTime> toStateTimes = stateTimeHistory.
+                stream().
+                filter(stateTime -> stateTime.stateId == this.toStateId).collect(Collectors.toList());
+        if (toStateTimes.size() > 0) {
+            StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
+            LandmarkSegment fromSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+            LandmarkSegment toSegment = new LandmarkSegment(
+                    new Landmark(fromSegment.startLandmark.landmarkType, new Point3F()),
+                    new Landmark(fromSegment.endLandmark.landmarkType, new Point3F())
+            );
+
+
+            if (isRelativeToExtremeDirection) {
+                switch (extremeDirection) {
+
+                    case MinX:
+                        toSegment.startLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minX;
+                        toSegment.endLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minX;
+
+                        break;
+                    case MinY:
+
+                        toSegment.startLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minY;
+                        toSegment.endLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minY;
+
+                        break;
+                    case MaxX:
+                        toSegment.startLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxX;
+                        toSegment.endLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxX;
+
+                        break;
+                    case MaxY:
+                        toSegment.startLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxY;
+                        toSegment.endLandmark.position = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxY;
+
+                        break;
+                    case MinX_MinY:
+
+                        toSegment.startLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minX.x;
+                        toSegment.endLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minX.x;
+
+                        toSegment.startLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minY.y;
+                        toSegment.endLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minY.y;
+
+                        break;
+                    case MinX_MaxY:
+
+                        toSegment.startLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minX.x;
+                        toSegment.endLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minX.x;
+
+                        toSegment.startLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxY.y;
+                        toSegment.endLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxY.y;
+
+                        break;
+                    case MaxX_MinY:
+                        toSegment.startLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxX.x;
+                        toSegment.endLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxX.x;
+
+                        toSegment.startLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).minY.y;
+                        toSegment.endLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).minY.y;
+
+                        break;
+                    case MaxX_MaxY:
+                        toSegment.startLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxX.x;
+                        toSegment.endLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxX.x;
+
+                        toSegment.startLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.startLandmark.landmarkType).maxY.y;
+                        toSegment.endLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromSegment.endLandmark.landmarkType).maxY.y;
+
+                        break;
+                }
+
+            }else {
+                toSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(toStateTime.poseMap);
             }
-        },
-        "id": "6932EBB0-7AB7-44FD-869A-CC9B387F1911",
-        "isRelativeToExtremeDirection": true,
-        "lowerBound": 1,
-        "toLandmarkSegment": {
-            "color": {
-                "blue": 0.9999999403953552,
-                "green": 0.4784314036369324,
-                "red": 0
-            },
-            "endLandmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftAnkle",
-                "position": {
-                    "x": 895.2235107421875,
-                    "y": 848.5889892578125,
-                    "z": 283.5280456542969
-                },
-                "selected": false
-            },
-            "selected": true,
-            "startLandmark": {
-                "color": {
-                    "blue": 0.9999999403953552,
-                    "green": 0.9999999403953552,
-                    "red": 0.9999999403953552
-                },
-                "landmarkType": "LeftKnee",
-                "position": {
-                    "x": 886.864501953125,
-                    "y": 732.7236328125,
-                    "z": -2.663571834564209
-                },
-                "selected": false
-            }
-        },
-        "toStateId": 7,
-        "upperBound": 1,
-        "warning": {
-            "changeStateClear": true,
-            "content": "",
-            "delayTime": 2,
-            "isScoreWarning": true,
-            "triggeredWhenRuleMet": false
+            Range<Double> range = range();
+
+            return ComplexRule.satisfyWithDirection(fromAxis, fromAxis, range, fromSegment, toSegment);
+        }else {
+            return true;
         }
+
+
     }
 
 
-     */
 }

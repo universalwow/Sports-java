@@ -38,4 +38,26 @@ public class ComplexRule {
 
         return false;
     }
+
+    public static boolean satisfyWithDirectionToObject(CoordinateAxis fromAxis,
+                                               Range<Double> range,
+                                               LandmarkSegment fromSegment, double relativeTo) {
+
+        switch (fromAxis) {
+
+            case X:
+                return range.contains(
+                  fromSegment.distanceXWithDirection()/relativeTo
+                );
+
+            case Y:
+
+                return range.contains(fromSegment.distanceYWithDirection()/relativeTo);
+            case XY:
+
+                return  range.contains(fromSegment.distance()/relativeTo);
+        }
+
+        return false;
+    }
 }

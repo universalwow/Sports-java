@@ -11,7 +11,7 @@ import java.util.List;
 
 
 enum ObjectLabel {
-    ROPE, POSE, BASKETBALL
+    rope, pose, basketball
 }
 
 @Data
@@ -25,5 +25,7 @@ public class ObservationRule {
     public List<ObjectToStateAngle> objectToStateAngle;
 
     public List<ObjectToStateDistance> objectToStateDistance;
+
+
 
 }

@@ -11,7 +11,10 @@ import org.apache.commons.lang3.Range;
 
 import java.util.Map;
 
-
+/*
+* 同LandmarkSegmentLength类完全相同
+*
+* */
 @Data
 public class DistanceToLandmark {
     public LandmarkSegmentToAxis from;
