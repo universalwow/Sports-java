@@ -22,10 +22,13 @@ public class ConfigParseUtil {
     private ConfigParseUtil() {
     }
 
-    public static void parseConfig() {
-        StopWatch sw = new StopWatch();
-        sw.start();
-        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/fileyf1.json");
+    /***
+     * 解析json
+     * @param is
+     * @param flag 若为false, 将photo置空
+     * @return
+     */
+    public static Sport parseConfig(InputStream is, boolean flag) {
         StringBuilder sb = new StringBuilder();
         try {
             Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
@@ -37,10 +40,11 @@ public class ConfigParseUtil {
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("parseConfig error, {}", ex.getMessage());
+            return null;
         }
 
         Sport sport = JSONObject.parseObject(sb.toString(), Sport.class);
-
+        if(flag) return sport;
 
         List<SportState> states = sport.getStates();
         states.forEach(state -> {
@@ -50,9 +54,14 @@ public class ConfigParseUtil {
             }
         });
 
-        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
-        sw.stop();
+        return sport;
+    }
 
+    public static void parseConfig() {
+        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/fileyf1.json");
+        Sport sport = parseConfig(is, true);
+
+        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
     }
 
     public static void main(String[] args) {
