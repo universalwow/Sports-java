@@ -1,13 +1,17 @@
 package com.astra.actionconfig.config.ruler;
 
+import com.astra.actionconfig.config.data.Observation;
+import com.astra.actionconfig.config.data.Point2F;
+import com.astra.actionconfig.config.data.Point3F;
+import com.astra.actionconfig.config.data.Warning;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToLandmark;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToObject;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateAngle;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateDistance;
 import lombok.Data;
 
-import java.util.List;
-
+import java.util.*;
 
 
 enum ObjectLabel {
@@ -25,6 +29,166 @@ public class ObservationRule {
     public List<ObjectToStateAngle> objectToStateAngle;
 
     public List<ObjectToStateDistance> objectToStateDistance;
+
+
+    public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
+                                      Map<LandmarkType, Point3F> poseMap,
+                                      List<Observation> objects,
+                                      Point2F frameSize) {
+        RuleSatisfyData objectToLandmarkSatisfies =
+                objectToLandmark.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0),
+                        (result, next) -> {
+                            boolean satisfy = false;
+
+                            Optional<Observation> selectedObject = objects.stream()
+                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                            if (selectedObject != null) {
+                                satisfy = next.satisfy(poseMap, selectedObject.get());
+                            }
+
+                            Set<Warning> newWarnings = result.warnings;
+
+                            if (next.warning.triggeredWhenRuleMet && satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfy,
+                                    newWarnings,
+                                    satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1
+                            );
+                        }, (a, b) -> null
+
+                );
+
+        RuleSatisfyData objectToObjectSatisfies =
+                objectToObject.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0),
+                        (result, next) -> {
+                            boolean satisfy = false;
+
+                            Optional<Observation> selectedFromObject = objects.stream()
+                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                            Optional<Observation> selectedToObject = objects.stream()
+                                    .filter(object -> object.label == next.toPosition.id).findFirst();
+
+                            if (selectedFromObject != null && selectedToObject != null) {
+                                satisfy = next.satisfy(poseMap, selectedFromObject.get(), selectedToObject.get());
+                            }
+
+                            Set<Warning> newWarnings = result.warnings;
+
+                            if (next.warning.triggeredWhenRuleMet && satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfy,
+                                    newWarnings,
+                                    satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1
+                            );
+                        }, (a, b) -> null
+
+                );
+
+        RuleSatisfyData objectToStateDistanceSatisfies =
+                objectToStateDistance.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0),
+                        (result, next) -> {
+                            boolean satisfy = false;
+
+                            Optional<Observation> selectedObject = objects.stream()
+                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                            if (selectedObject != null) {
+                                satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
+                            }
+
+                            Set<Warning> newWarnings = result.warnings;
+
+                            if (next.warning.triggeredWhenRuleMet && satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfy,
+                                    newWarnings,
+                                    satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1
+                            );
+                        }, (a, b) -> null
+
+                );
+
+        RuleSatisfyData objectToStateAngleSatisfies =
+                objectToStateAngle.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0),
+                        (result, next) -> {
+                            boolean satisfy = false;
+
+                            Optional<Observation> selectedObject = objects.stream()
+                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                            if (selectedObject != null) {
+                                satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
+                            }
+
+                            Set<Warning> newWarnings = result.warnings;
+
+                            if (next.warning.triggeredWhenRuleMet && satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfy,
+                                    newWarnings,
+                                    satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1
+                            );
+                        }, (a, b) -> null
+
+                );
+
+
+
+
+        Set<Warning> warnings = new HashSet<>();
+        warnings.addAll(objectToLandmarkSatisfies.warnings);
+        warnings.addAll(objectToObjectSatisfies.warnings);
+        warnings.addAll(objectToStateDistanceSatisfies.warnings);
+        warnings.addAll(objectToStateAngleSatisfies.warnings);
+        return new RuleSatisfyData(
+                objectToLandmarkSatisfies.satisfy &&
+                        objectToObjectSatisfies.satisfy &&
+                        objectToStateDistanceSatisfies.satisfy &&
+                        objectToStateAngleSatisfies.satisfy,
+                warnings,
+                objectToLandmarkSatisfies.pass +
+                        objectToObjectSatisfies.pass +
+                        objectToStateDistanceSatisfies.pass +
+                        objectToStateAngleSatisfies.pass,
+                objectToLandmarkSatisfies.total +
+                        objectToObjectSatisfies.total +
+                        objectToStateDistanceSatisfies.total +
+                        objectToStateAngleSatisfies.total);
+    }
 
 
 

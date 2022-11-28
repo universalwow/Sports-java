@@ -35,7 +35,7 @@ public class LandmarkRule {
         RuleSatisfyData distanceToLandmarkSatisfies =
                 distanceToLandmark.stream().reduce(
                         new RuleSatisfyData(true,
-                                new HashSet<Warning>(),
+                                new HashSet<>(),
                                 0, 0),
                         (result, next) -> {
                             boolean satisfy = next.satisfy(poseMap);
@@ -53,16 +53,14 @@ public class LandmarkRule {
                                     satisfy ? result.pass + 1 : result.pass,
                                     result.total + 1
                             );
-                        }, (a, b) -> {
-                            return  null;
-                        }
+                        }, (a, b) -> null
 
                 );
 
         RuleSatisfyData angleToLandmarkSatisfies =
                 angleToLandmark.stream().reduce(
                         new RuleSatisfyData(true,
-                                new HashSet<Warning>(),
+                                new HashSet<>(),
                                 0, 0),
                         (result, next) -> {
                             boolean satisfy = next.satisfy(poseMap);
@@ -80,16 +78,14 @@ public class LandmarkRule {
                                     satisfy ? result.pass + 1 : result.pass,
                                     result.total + 1
                             );
-                        }, (a, b) -> {
-                            return  null;
-                        }
+                        }, (a, b) -> null
 
                 );
 
         RuleSatisfyData landmarkToStateDistanceSatisfies =
                 landmarkToStateDistance.stream().reduce(
                         new RuleSatisfyData(true,
-                                new HashSet<Warning>(),
+                                new HashSet<>(),
                                 0, 0),
                         (result, next) -> {
                             boolean satisfy = next.satisfy(stateTimeHistory, poseMap);
@@ -107,16 +103,14 @@ public class LandmarkRule {
                                     satisfy ? result.pass + 1 : result.pass,
                                     result.total + 1
                             );
-                        }, (a, b) -> {
-                            return  null;
-                        }
+                        }, (a, b) -> null
 
                 );
 
         RuleSatisfyData landmarkToStateAngleSatisfies =
                 landmarkToStateAngle.stream().reduce(
                         new RuleSatisfyData(true,
-                                new HashSet<Warning>(),
+                                new HashSet<>(),
                                 0, 0),
                         (result, next) -> {
                             boolean satisfy = next.satisfy(stateTimeHistory, poseMap);
@@ -134,13 +128,11 @@ public class LandmarkRule {
                                     satisfy ? result.pass + 1 : result.pass,
                                     result.total + 1
                             );
-                        }, (a, b) -> {
-                            return  null;
-                        }
+                        }, (a, b) -> null
 
                 );
 
-        Set<Warning> warnings = new HashSet<Warning>();
+        Set<Warning> warnings = new HashSet<>();
         warnings.addAll(distanceToLandmarkSatisfies.warnings);
         warnings.addAll(angleToLandmarkSatisfies.warnings);
         warnings.addAll(landmarkToStateDistanceSatisfies.warnings);

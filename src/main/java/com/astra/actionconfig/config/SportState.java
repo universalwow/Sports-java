@@ -29,4 +29,7 @@ public class SportState {
     public List<Rules> scoreRules;
     //下面两个没有数据
     public List<Rules> violateRules;
+
+
+    
 }
