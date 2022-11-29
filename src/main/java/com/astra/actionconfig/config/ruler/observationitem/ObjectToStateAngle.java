@@ -117,7 +117,7 @@ public class ObjectToStateAngle {
                 }
 
             }else {
-                toObjectPoint = toStateTime.object.getValue().pointOf(fromPosition.position);
+                toObjectPoint = toStateTime.object.get().pointOf(fromPosition.position);
             }
 
             LandmarkSegment landmarkSegment = new LandmarkSegment(
