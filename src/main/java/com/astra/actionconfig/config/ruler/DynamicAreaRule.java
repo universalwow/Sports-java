@@ -24,6 +24,13 @@ public class DynamicAreaRule {
     public RuleClass ruleClass = RuleClass.DynamicArea;//
     public List<LandmarkInArea> landmarkInDynamicArea; //猜测
 
+    public void generateDynamicArea(String areaId, List<Point2F> area) {
+        for (int i = 0; i < landmarkInDynamicArea.size(); i++) {
+            if (landmarkInDynamicArea.get(i).areaId == areaId) {
+                landmarkInDynamicArea.get(i).area = area.toArray(new Point2F[area.size());
+            }
+        }
+    }
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
                                       Map<LandmarkType, Point3F> poseMap,
@@ -56,4 +63,6 @@ public class DynamicAreaRule {
 
         return landmarkInDynamicAreaSatisfies;
     }
+
+
 }

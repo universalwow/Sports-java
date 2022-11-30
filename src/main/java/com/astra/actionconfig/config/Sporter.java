@@ -153,11 +153,11 @@ public class Sporter {
             }).findFirst().get();
 //            TODO: -------------------------------------------
 
-//            List<Point2F> area = sport
+
+            List<Point2F> area = sport.generateDynamicArea(dynamicArea.imageSize.get(), areaId);
+            sport.updateDynamicArea(areaId,area);
+            sport.generateDynamicArea(areaId,area);
         });
-
-
-
     }
 
     List<ScoreTime> allStateTimeHistory = new ArrayList<ScoreTime>();

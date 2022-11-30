@@ -122,6 +122,16 @@ public class SportState {
         return areas;
     }
 
+    public void generateDynamicArea(String areaId, List<Point2F> area) {
+        for (int i = 0; i < scoreRules.size(); i++) {
+            scoreRules.get(i).gnerateDynamicArea(areaId, area);
+        }
+
+        for (int i = 0; i < violateRules.size(); i++) {
+            violateRules.get(i).gnerateDynamicArea(areaId, area);
+        }
+    }
+
 
     public RuleSatisfyData rulesSatisfy(RuleType ruleType,
                                         List<StateTime> stateTimeHistory,
@@ -187,7 +197,6 @@ public class SportState {
 
 
     }
-
 
 
 

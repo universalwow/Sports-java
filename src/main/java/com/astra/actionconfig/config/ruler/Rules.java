@@ -26,6 +26,11 @@ public class Rules {
     //ObservationRuler未定义完全
     public List<ObservationRule> observationRules;
 
+    public void gnerateDynamicArea(String areaId, List<Point2F> area) {
+        for (int i = 0; i < dynamicAreaRules.size(); i++) {
+            dynamicAreaRules.get(i).generateDynamicArea(areaId, area);
+        }
+    }
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
                                       Map<LandmarkType, Point3F> poseMap,
@@ -161,5 +166,6 @@ public class Rules {
                         fixedAreaRulesSatisfies.total +
                         dynamicAreaRulesSatisfies.total);
     }
+
 
 }

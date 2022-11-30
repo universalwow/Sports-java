@@ -2,9 +2,11 @@ package com.astra.actionconfig.config;
 
 import com.astra.actionconfig.config.data.DynamicArea;
 import com.astra.actionconfig.config.data.FixedArea;
+import com.astra.actionconfig.config.data.Point2F;
 import com.astra.actionconfig.config.data.Question;
 import com.astra.actionconfig.config.data.state.SportStateTransform;
 import com.astra.actionconfig.config.data.state.ViolateStateSequence;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.List;
@@ -68,6 +70,64 @@ public class Sport {
     public List<String> selectedLandmarkTypes; //
 
     public List<Question> questions; //
+
+    public Optional<Integer> findFirstDynamicAreaIndex(String areaId) {
+        Optional<Integer> index = null;
+        for (int i = 0; i < dynamicAreas.size(); i++) {
+            if (dynamicAreas.get(i).id == areaId) {
+                index = Optional.of(i);
+            }
+        }
+        return  index;
+    }
+
+    public void updateDynamicArea(String areaId, List<Point2F> area) {
+        int areaIndex = findFirstDynamicAreaIndex(areaId).get();
+        dynamicAreas.get(areaIndex).area = area.toArray(new Point2F[area.size()]);
+    }
+
+    public void  generateDynamicArea(String areaId, List<Point2F> area){
+        for (int i = 0; i < states.size(); i++) {
+            states.get(i).generateDynamicArea(areaId, area);
+        }
+    }
+
+    public List<Point2F> generateDynamicArea(Point2F imageSize, String areaId) {
+        int areaIndex = findFirstDynamicAreaIndex(areaId).get();
+        DynamicArea area = dynamicAreas.get(areaIndex);
+        double width = area.width;
+        double heightToWidthRatio = area.heightToWidthRatio;
+
+        double centerX = area.limitedArea[0] * imageSize.x +
+                Math.random() * ((area.limitedArea[2]  - area.limitedArea[0]) * imageSize.x);
+
+        double centerY = area.limitedArea[1] * imageSize.y +
+                Math.random() * ((area.limitedArea[3]  - area.limitedArea[1]) * imageSize.y);
+
+        double width_ = imageSize.x * width;
+        double height = width_ * heightToWidthRatio;
+
+        Point2F leftTop = new Point2F(
+                centerX - width_/2,
+                centerY - height/2
+        );
+
+        Point2F rightTop = new Point2F(
+                centerX + width_/2,
+                centerY - height/2
+        );
+
+        Point2F rightBottom = new Point2F(
+                centerX + width_/2,
+                centerY + height/2
+        );
+
+        Point2F leftBottom = new Point2F(
+                centerX - width_/2,
+                centerY + height/2
+        );
+        return Lists.newArrayList(leftTop, rightTop, rightBottom, leftBottom);
+    }
 
 
 }
