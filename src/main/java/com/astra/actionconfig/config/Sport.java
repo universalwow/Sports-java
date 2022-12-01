@@ -63,13 +63,20 @@ public class Sport {
     public Optional<Integer> interactionScoreCycle;  //
 
     //下面这个，没有数据，暂时不清楚其格式
-    public List<List<Integer>> interactionScoreStateSequence; // 含义待定
+    public List<List<Integer>> interactionScoreStateSequence = Lists.newArrayList(); // 含义待定
 
     //下面两个，没有数据，暂时不清楚其格式
     public List<String> collectedObjects; //
     public List<String> selectedLandmarkTypes; //
 
     public List<Question> questions; //
+
+
+    public Optional<SportState> findFirstStateByStateId(int stateId) {
+        return states.stream().filter(state -> {
+            return state.id == stateId;
+        }).findFirst();
+    }
 
     public Optional<Integer> findFirstDynamicAreaIndex(String areaId) {
         Optional<Integer> index = null;
