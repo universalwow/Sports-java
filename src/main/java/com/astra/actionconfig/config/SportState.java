@@ -44,7 +44,7 @@ public class SportState {
         return new SportState(-1, "interAction_1", "interAction_1");
     }
 
-    public static SportState interAction_２() {
+    public static SportState interAction_2() {
         return new SportState(-2, "提交答案", "提交答案");
     }
 

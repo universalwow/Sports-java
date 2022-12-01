@@ -18,7 +18,7 @@ public class StateTime {
     public Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps;
 
 
-    public StateTime(int stateId, double time, HashMap<LandmarkType, Point3F> poseMap,
+    public StateTime(int stateId, double time, Map<LandmarkType, Point3F> poseMap,
                      Optional<Observation> object) {
         this.stateId = stateId;
         this.time = time;

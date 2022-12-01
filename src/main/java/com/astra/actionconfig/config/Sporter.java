@@ -4,6 +4,7 @@ import com.astra.actionconfig.config.data.*;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.config.ruler.StateTime;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +17,14 @@ class ScoreTime {
     Map<LandmarkType, Point3F> poseMap;
     Optional<Observation> object;
 
+    public ScoreTime(int stateId, double time, boolean valid, Map<LandmarkType, Point3F> poseMap, Optional<Observation> object) {
+        this.stateId = stateId;
+        this.time = time;
+        this.valid = valid;
+        this.poseMap = poseMap;
+        this.object = object;
+    }
+
     public String id() {
         return String.format("%d-%f", stateId, time);
     }
@@ -25,6 +34,12 @@ class WarningData {
     Warning warning;
     int stateId;
     double time;
+
+    public WarningData(Warning warning, int stateId, double time) {
+        this.warning = warning;
+        this.stateId = stateId;
+        this.time = time;
+    }
 
     public String id() {
         return String.format("%d-%f-%s", stateId, warning.content, time);
@@ -151,8 +166,6 @@ public class Sporter {
             DynamicArea dynamicArea = sport.dynamicAreas.stream().filter(area -> {
                 return area.id == areaId;
             }).findFirst().get();
-//            TODO: -------------------------------------------
-
 
             List<Point2F> area = sport.generateDynamicArea(dynamicArea.imageSize.get(), areaId);
             sport.updateDynamicArea(areaId,area);
@@ -168,6 +181,135 @@ public class Sporter {
 
     StateTime currentStateTime = new StateTime(SportState.startState().id, 0,
             new HashMap<LandmarkType, Point3F>(), null);
+
+    public void currentStateTimeSetted() {
+        allStateTimeHistory.add(
+                new ScoreTime(currentStateTime.stateId, currentStateTime.time, true, currentStateTime.poseMap, currentStateTime.object)
+        );
+
+        Set<Warning> allCurrentFrameWarnings = new HashSet<>();
+        sport.violateStateSequence.forEach( violateStates -> {
+                if (stateTimeHistory.size() >= violateStates.stateIds.size()){
+                    boolean allStateSatisfy = true;
+                    for (int i = 0; i < violateStates.stateIds.size(); i++) {
+                        boolean b = violateStates.stateIds.get(i) == stateTimeHistory.get(
+                                i + stateTimeHistory.size() - violateStates.stateIds.size()
+                        ).stateId;
+                        allStateSatisfy = allStateSatisfy && b;
+                    }
+
+                    if (allStateSatisfy) {
+                        allCurrentFrameWarnings.add(violateStates.warning);
+                    }
+                }
+        });
+        updateNoDelayWarnings(currentStateTime.time, allCurrentFrameWarnings);
+
+        switch (sport.interactionType) {
+
+            case None:
+                break;
+            case SingleChoice:
+                if (currentStateTime.stateId == SportState.interAction_1().id) {
+                    answerSet.clear();
+                    this.question = Optional.ofNullable(sport.questions.get(new Random().nextInt(sport.questions.size())));
+                } else if (currentStateTime.stateId == SportState.interAction_2().id) {
+                    if (this.question.get().answerIndexs().equals(answerSet)) {
+                        interactionScoreTimes.add(
+                                new ScoreTime(currentStateTime.stateId, currentStateTime.time, true, currentStateTime.poseMap, currentStateTime.object)
+                        );
+                    }
+                    this.question = null;
+                    this.answerSet.clear();
+                } else if (Lists.newArrayList(
+                        SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id,
+                        SportState.interAction_d().id).contains(currentStateTime.stateId)) {
+                    if (answerSet.contains(currentStateTime.stateId)) {
+                        answerSet.remove(currentStateTime.stateId);
+                    }else{
+                        this.answerSet.clear();
+                        this.answerSet.add(currentStateTime.stateId);
+                    }
+                }
+
+                break;
+            case MultipleChoice:
+                if (currentStateTime.stateId == SportState.interAction_1().id) {
+                    this.answerSet.clear();
+                    this.question = Optional.ofNullable(sport.questions.get(new Random().nextInt(sport.questions.size())));
+                } else if (currentStateTime.stateId == SportState.interAction_2().id){
+                    if (this.question.get().answerIndexs().equals(answerSet)) {
+                        if (sport.sportClass == SportClass.Counter) {
+                            interactionScoreTimes.add(
+                                    new ScoreTime(currentStateTime.stateId, currentStateTime.time, true, currentStateTime.poseMap, currentStateTime.object)
+                            );
+                        }
+                    }
+
+                    this.question = null;
+                    this.answerSet.clear();
+                }  else if (Lists.newArrayList(
+                        SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id,
+                        SportState.interAction_d().id).contains(currentStateTime.stateId)) {
+                    if (answerSet.contains(currentStateTime.stateId)) {
+                        answerSet.remove(currentStateTime.stateId);
+                    }else{
+                        this.answerSet.add(currentStateTime.stateId);
+                    }
+                }
+                break;
+            case SingleTouch:
+                getDynamicAreas();
+                break;
+            case OrdinalTouch:
+                if (currentStateTime.stateId == SportState.interAction_1().id) {
+                    this.answerSet.clear();
+                    orderTouchStart = true;
+                    getDynamicAreas();
+                } else if (Lists.newArrayList(
+                        SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id,
+                        SportState.interAction_d().id).contains(currentStateTime.stateId)) {
+                    this.answerSet.add(currentStateTime.stateId);
+                    if (this.answerSet.size() == sport.dynamicAreaNumber){
+                        if (sport.sportClass == SportClass.Counter) {
+                            interactionScoreTimes.add(
+                                    new ScoreTime(currentStateTime.stateId, currentStateTime.time, true, currentStateTime.poseMap, currentStateTime.object)
+                            );
+                        }
+                        currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                        orderTouchStart =false;
+                    }
+
+                    if (this.answerSet.size() == 1) {
+                        if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id))){
+                            currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            orderTouchStart =false;
+                        }
+                    } else if (this.answerSet.size() == 2) {
+                        if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id, SportState.interAction_b().id))){
+                            currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            orderTouchStart =false;
+                        }
+                    } else if (this.answerSet.size() == 3) {
+                        if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id))){
+                            currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            orderTouchStart =false;
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private void updateNoDelayWarnings(double time, Set<Warning> allCurrentFrameWarnings) {
+        allCurrentFrameWarnings.forEach( warning -> {
+            noDelayWarnings.add(warning);
+            warningsData.add(new WarningData(warning, currentStateTime.stateId, time));
+        }
+        );
+    }
+
+
     SportState nextState = SportState.startState();
     List<ScoreTime> scoreTimes = new ArrayList<>();
     List<ScoreTime> interactionScoreTimes = new ArrayList<>();
