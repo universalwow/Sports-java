@@ -27,7 +27,7 @@ public class DynamicAreaRule {
     public void generateDynamicArea(String areaId, List<Point2F> area) {
         for (int i = 0; i < landmarkInDynamicArea.size(); i++) {
             if (landmarkInDynamicArea.get(i).areaId == areaId) {
-                landmarkInDynamicArea.get(i).area = area.toArray(new Point2F[area.size());
+                landmarkInDynamicArea.get(i).area = area.toArray(new Point2F[area.size()]);
             }
         }
     }

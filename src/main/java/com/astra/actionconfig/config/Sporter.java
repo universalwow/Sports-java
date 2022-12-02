@@ -535,7 +535,7 @@ public class Sporter {
 
         objectLabels.forEach(objectLabel -> {
             Optional<Observation> collectedObject = objects.stream().filter(object -> {
-                return object.label == objectLabel
+                return object.label == objectLabel;
             }).findFirst();
 
             if (collectedObject != null) {
@@ -599,7 +599,7 @@ public class Sporter {
 
     }
 
-    
+
 
     double lastTime = 0;
 
