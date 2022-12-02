@@ -299,6 +299,76 @@ public class Sporter {
                 }
                 break;
         }
+        if (currentStateTime.stateId == SportState.startState().id) {
+            stateTimeHistory.clear();
+            stateTimeHistory.add(currentStateTime);
+        } else {
+            stateTimeHistory.add(currentStateTime);
+            sport.scoreStateSequence.forEach( scoreStates -> {
+                if (stateTimeHistory.size() >= scoreStates.size()) {
+                    boolean allStateSatisfy = true;
+                    for (int i = 0; i < scoreStates.size(); i++) {
+                        boolean b = scoreStates.get(i) == stateTimeHistory.get(i + stateTimeHistory.size() - scoreStates.size()).stateId;
+                        allStateSatisfy = allStateSatisfy && b;
+                    }
+
+                    if (allStateSatisfy) {
+                        if (sport.sportClass == SportClass.Counter) {
+                            scoreTimes.add(
+                                    new ScoreTime(currentStateTime.stateId, currentStateTime.time,true, currentStateTime.poseMap, currentStateTime.object)
+                            );
+                        } else {
+                            scoreTimes.addAll(timerScoreTimes);
+                        }
+                    }
+
+                }
+                }
+
+            );
+
+
+            sport.interactionScoreStateSequence.forEach( scoreStates -> {
+                        if (stateTimeHistory.size() >= scoreStates.size()) {
+                            boolean allStateSatisfy = true;
+                            for (int i = 0; i < scoreStates.size(); i++) {
+                                boolean b = scoreStates.get(i) == stateTimeHistory.get(i + stateTimeHistory.size() - scoreStates.size()).stateId;
+                                allStateSatisfy = allStateSatisfy && b;
+                            }
+
+                            if (allStateSatisfy) {
+                                if (sport.sportClass == SportClass.Counter) {
+                                    interactionScoreTimes.add(
+                                            new ScoreTime(currentStateTime.stateId, currentStateTime.time,true, currentStateTime.poseMap, currentStateTime.object)
+                                    );
+                                } else {
+                                    interactionScoreTimes.addAll(timerScoreTimes);
+                                }
+                            }
+
+                        }
+                    }
+
+            );
+
+            timerScoreTimes.clear();
+//            TODO: state change
+            Optional<SportState> currentState = sport.findFirstStateByStateId(currentStateTime.stateId);
+
+            if (currentState != null) {
+                Optional<Integer> directToStateId = currentState.get().directToStateId;
+                if (directToStateId != null && directToStateId.get() != SportState.endState().id && directToStateId.get() != -100) {
+                    this.currentStateTime = new StateTime(
+                            directToStateId.get(),
+                            currentStateTime.time,
+                            currentStateTime.poseMap,
+                            currentStateTime.object,
+                            currentStateTime.dynamicObjectsMaps,
+                            currentStateTime.dynamicPoseMaps
+                    );
+                }
+            }
+        }
     }
 
     private void updateNoDelayWarnings(double time, Set<Warning> allCurrentFrameWarnings) {

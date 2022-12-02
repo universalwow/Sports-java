@@ -26,4 +26,15 @@ public class StateTime {
         this.object = object;
 
     }
+
+    public StateTime(int stateId, double time, Map<LandmarkType, Point3F> poseMap,
+                     Optional<Observation> object, Map<String, ExtremeObject> dynamicObjectsMaps, Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps) {
+        this.stateId = stateId;
+        this.time = time;
+        this.poseMap = poseMap;
+        this.object = object;
+        this.dynamicObjectsMaps = dynamicObjectsMaps;
+        this.dynamicPoseMaps = dynamicPoseMaps;
+
+    }
 }
