@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 class ScoreTime {
@@ -461,6 +462,7 @@ public class Sporter {
             warningsData.add(warning);
             this.cancel();
             this.timer.cancel();
+            this.timer.purge();
 
         }
 
@@ -512,6 +514,7 @@ public class Sporter {
                 }
                 this.cancel();
                 timer.cancel();
+                this.timer.purge();
                 inCheckingStateHistory.remove(state.name);
                 inCheckingStatesTimer.remove(state.name);
             }
@@ -598,12 +601,78 @@ public class Sporter {
 
 
     }
-
-
-
+    
     double lastTime = 0;
 
+    private void updateWarnings(double currentTime, Set<Warning> allCurrentFrameWarnings){
+        allCurrentFrameWarnings.forEach(warning -> {
+            if (warning.delayTime < 0.3) {
+                noDelayWarnings.add(warning);
+                warningsData.add(new WarningData(warning, currentStateTime.stateId, currentTime));
+            }
+        });
 
+        List<WarningData> totalWarnings = allCurrentFrameWarnings.stream().map(warning -> {
+            return new WarningData(warning, currentStateTime.stateId, currentTime);
+        }).collect(Collectors.toList());
+
+        List<Warning> cancelWarnings = cancelableWarningMap.keySet().stream().filter(warning -> {
+            return !totalWarnings.stream().map(newWarning -> {
+                return newWarning.warning.content;
+            }).collect(Collectors.toList()).contains(warning.content);
+        }).collect(Collectors.toList());
+
+        cancelWarnings.forEach(warning -> {
+            if (cancelableWarningMap.containsKey(warning)) {
+                cancelableWarningMap.get(warning).cancel();
+                cancelableWarningMap.get(warning).purge();
+                cancelableWarningMap.remove(warning);
+            }
+        });
+
+        this.delayWarnings.removeAll(cancelWarnings);
+
+        totalWarnings.stream().filter(warningData -> {
+            return  !cancelableWarningMap.keySet().stream().map(warning -> {
+                return warning.content;
+            }).collect(Collectors.toList()).contains(warningData.warning.content);
+
+        }).forEach(warningData -> {
+            if (warningData.warning.delayTime >= 0.3) {
+                cancelableWarningMap.put(warningData.warning, warningTimer(warningData));
+            }
+        });
+
+    }
+
+    public void play(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
+        switch (sport.sportClass) {
+
+            case Counter:
+                playCounter(poseMap, objects, frameSize, currentTime);
+                break;
+            case Timer:
+                playTimer(poseMap, objects, frameSize, currentTime);
+                break;
+            case TimeCounter:
+                playTimeCounter(poseMap, objects, frameSize, currentTime);
+                break;
+            case None:
+                break;
+        }
+
+    }
+
+    private void playTimeCounter(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
+
+    }
+
+    private void playTimer(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
+
+    }
+
+    private void playCounter(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
+    }
 
 
 }
