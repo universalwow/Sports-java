@@ -2,11 +2,14 @@ package com.astra.actionconfig.config;
 
 import com.astra.actionconfig.config.data.*;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.astra.actionconfig.config.ruler.ExtremeObject;
+import com.astra.actionconfig.config.ruler.ExtremePoint3D;
 import com.astra.actionconfig.config.ruler.StateTime;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -382,12 +385,59 @@ public class Sporter {
 
     SportState nextState = SportState.startState();
     List<ScoreTime> scoreTimes = new ArrayList<>();
+
+    private void scoreTimesSetted() {
+        if (scoreTimes.isEmpty()) {
+            return;
+        }
+
+        if (sport.interactionType != InteractionType.None &&
+        scoreTimes.size() % sport.interactionScoreCycle.get() == 0) {
+            ScoreTime lastScoreTime = scoreTimes.get(scoreTimes.size() -1);
+            currentStateTime = new StateTime(
+                    -1, lastScoreTime.time, lastScoreTime.poseMap, lastScoreTime.object
+            );
+        }
+    }
     List<ScoreTime> interactionScoreTimes = new ArrayList<>();
 
     Set delayWarnings = new HashSet<Warning>();
     Set noDelayWarnings = new HashSet<Warning>();
 
     List<ScoreTime> timerScoreTimes = new ArrayList<>();
+
+    private void timerScoreTimesSetted() {
+        if (timerScoreTimes.isEmpty()) {
+            return;
+        }
+        ScoreTime last_1 = timerScoreTimes.get(timerScoreTimes.size()-1);
+        SportState state = sport.findFirstStateByStateId(last_1.stateId).get();
+
+        if (sport.sportDiscrete == SportPeriod.Continuous && timerScoreTimes.size() > 1) {
+            ScoreTime last_2 = timerScoreTimes.get(timerScoreTimes.size() -2);
+            if (last_2.stateId == last_1.stateId) {
+                if (last_1.time - last_2.time > state.checkCycle + 0.5) {
+                    timerScoreTimes.clear();
+                    timerScoreTimes.add(last_1);
+                }
+            } else {
+                timerScoreTimes.clear();
+                timerScoreTimes.add(last_1);
+            }
+        } else if (sport.sportDiscrete == SportPeriod.Discrete && timerScoreTimes.size() > 1) {
+            last_1 = timerScoreTimes.get(timerScoreTimes.size()-1);
+            ScoreTime last_2 = timerScoreTimes.get(timerScoreTimes.size() -2);
+            if (last_2.stateId != last_1.stateId) {
+                timerScoreTimes.clear();
+                timerScoreTimes.add(last_1);
+            }
+
+        }
+
+        if (timerScoreTimes.size() == state.keepTime) {
+            currentStateTime = new StateTime(state.id, last_1.time, last_1.poseMap, last_1.object);
+        }
+    }
 
     List<StateTime> stateTimeHistory = Lists.newArrayList(new StateTime(SportState.startState().id, 0,
             new HashMap<>(), null));
@@ -396,23 +446,162 @@ public class Sporter {
 
     List<WarningData> warningsData = new ArrayList<>();
 
+    class WarningTimerTask extends TimerTask {
+        WarningData warning;
+        Timer timer;
+
+        public WarningTimerTask(Timer timer, WarningData warning) {
+            this.timer = timer;
+            this.warning = warning;
+        }
+
+        @Override
+        public void run() {
+            delayWarnings.add(warning.warning);
+            warningsData.add(warning);
+            this.cancel();
+            this.timer.cancel();
+
+        }
+
+    }
+
     public Timer warningTimer(WarningData warning) {
+        Timer timer = new Timer();
+        TimerTask task =new WarningTimerTask(timer, warning);
+        timer.schedule(task, (long) (warning.warning.delayTime * 1000));
         return new Timer();
     }
 
     Map<String, List<Boolean>> inCheckingStateHistory = new HashMap<>();
     Map<String, Timer> inCheckingStatesTimer = new HashMap<>();
 
+    class CheckStateTimerTask extends TimerTask {
+        Timer timer;
+        SportState state;
+        double time;
+        Map<LandmarkType, Point3F> poseMap;
+        Optional<Observation> object;
+
+        public CheckStateTimerTask(Timer timer, SportState state, double currentTime, Map<LandmarkType, Point3F> poseMap, Optional<Observation> object) {
+            this.timer = timer;
+            this.state = state;
+            this.time = currentTime;
+            this.poseMap = poseMap;
+            this.object = object;
+        }
+
+        @Override
+        public void run() {
+
+            if (inCheckingStateHistory.keySet().contains(state.name)) {
+                AtomicInteger total = new AtomicInteger();
+                AtomicInteger pass = new AtomicInteger();
+
+                inCheckingStateHistory.get(state.name).forEach(flag -> {
+                    total.addAndGet(1);
+                    pass.addAndGet((flag ? 1 : 0));
+                });
+
+                if (total.get() > 0 && (float)pass.get()/total.get() > state.passingRate) {
+                    timerScoreTimes.add(
+                            new ScoreTime(state.id, time, true, poseMap, object)
+                    );
+                    nextStatePreview = state;
+
+                }
+                this.cancel();
+                timer.cancel();
+                inCheckingStateHistory.remove(state.name);
+                inCheckingStatesTimer.remove(state.name);
+            }
+        }
+    }
+
+    private Timer checkStateTimer(SportState state, double currentTime, double delay, Map<LandmarkType,Point3F> poseMap, Optional<Observation> object) {
+        Timer timer = new Timer();
+        CheckStateTimerTask task = new CheckStateTimerTask(timer, state, currentTime, poseMap, object);
+        timer.schedule(task, (long) (delay * 1000));
+        return timer;
+
+
+    }
+
+    private void updateCurrentStateObjectBounds(List<Observation> objects, List<String> objectLabels) {
+        if (stateTimeHistory.isEmpty()) {
+            return;
+        }
+        int index = stateTimeHistory.size() -1;
+
+        objectLabels.forEach(objectLabel -> {
+            Optional<Observation> collectedObject = objects.stream().filter(object -> {
+                return object.label == objectLabel
+            }).findFirst();
+
+            if (collectedObject != null) {
+                Observation collectedObject_ = collectedObject.get();
+                if (!stateTimeHistory.get(index).dynamicObjectsMaps.containsKey(objectLabel)) {
+                    stateTimeHistory.get(index).dynamicObjectsMaps.put(objectLabel, new ExtremeObject(collectedObject_));
+                } else {
+                    ExtremeObject object = stateTimeHistory.get(index).dynamicObjectsMaps.get(objectLabel);
+                    if (collectedObject_.rectangle().getCenterX() < object.minX.rectangle().getCenterX()) {
+                        object.minX = collectedObject_;
+                    }
+
+                    if (collectedObject_.rectangle().getCenterX() > object.maxX.rectangle().getCenterX()) {
+                        object.maxX = collectedObject_;
+                    }
+
+                    if (collectedObject_.rectangle().getCenterY() < object.minY.rectangle().getCenterY()) {
+                        object.minY = collectedObject_;
+                    }
+
+                    if (collectedObject_.rectangle().getCenterY() > object.maxY.rectangle().getCenterY()) {
+                        object.maxY = collectedObject_;
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateCurrentStateLandmarkBounds(Map<LandmarkType, Point3F> poseMap, List<LandmarkType> landmarkTypes) {
+        if (stateTimeHistory.isEmpty()) {
+            return;
+        }
+        int index = stateTimeHistory.size() -1;
+
+        landmarkTypes.forEach(landmarkType -> {
+            Point3F point = poseMap.get(landmarkType);
+
+            if (!stateTimeHistory.get(index).dynamicPoseMaps.containsKey(landmarkType)) {
+                stateTimeHistory.get(index).dynamicPoseMaps.put(landmarkType, new ExtremePoint3D(point));
+            }else {
+                ExtremePoint3D object = stateTimeHistory.get(index).dynamicPoseMaps.get(landmarkType);
+                if (point.x < object.minX.x) {
+                    object.minX = point;
+                }
+
+                if (point.x > object.maxX.x) {
+                    object.maxX = point;
+                }
+
+                if (point.y < object.minY.y) {
+                    object.minY = point;
+                }
+
+                if (point.y > object.maxY.y) {
+                    object.maxY = point;
+                }
+            }
+
+        });
+
+
+    }
+
+    
+
     double lastTime = 0;
-
-
-
-
-
-
-
-
-
 
 
 
