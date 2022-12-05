@@ -4,6 +4,7 @@ import com.astra.actionconfig.config.data.DynamicArea;
 import com.astra.actionconfig.config.data.FixedArea;
 import com.astra.actionconfig.config.data.Point2F;
 import com.astra.actionconfig.config.data.Question;
+import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.config.data.state.SportStateTransform;
 import com.astra.actionconfig.config.data.state.ViolateStateSequence;
 import com.google.common.collect.Lists;
@@ -67,7 +68,7 @@ public class Sport {
 
     //下面两个，没有数据，暂时不清楚其格式
     public List<String> collectedObjects; //
-    public List<String> selectedLandmarkTypes; //
+    public List<LandmarkType> selectedLandmarkTypes; //
 
     public List<Question> questions; //
 
