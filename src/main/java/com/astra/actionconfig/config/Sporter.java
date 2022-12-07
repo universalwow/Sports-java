@@ -898,12 +898,132 @@ public class Sporter {
     }
 
     private void playTimeCounter(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
+        if (lastTime > currentTime) {
+            return;
+        }
 
+        if (!sport.selectedLandmarkTypes.isEmpty()) {
+            updateCurrentStateLandmarkBounds(poseMap, sport.selectedLandmarkTypes);
+        }
+        if (!sport.collectedObjects.isEmpty()) {
+            updateCurrentStateObjectBounds(objects, sport.collectedObjects);
+        }
+
+        Set<Warning> allCurrentFrameWarnings = new HashSet<>();
+
+        Stream<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from);
+        List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.map( transform -> {
+            Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
+            if (toState != null) {
+                RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.VIOLATE, stateTimeHistory, poseMap, objects, frameSize);
+                return satisfy;
+            }
+            return new RuleSatisfyData(false, new HashSet<>(), 0 ,0);
+        }).collect(Collectors.toList());
+
+        if (violateRulesTransformSatisfy.size() == 1) {
+            allCurrentFrameWarnings.addAll(violateRulesTransformSatisfy.get(0).warnings);
+        } else if (violateRulesTransformSatisfy.size() > 1) {
+            List<RuleSatisfyData> allRulesSatisfySorted = violateRulesTransformSatisfy.stream().
+                    sorted(Comparator.comparing(RuleSatisfyData::getPass).reversed()).collect(Collectors.toList());
+            if (allRulesSatisfySorted.size() > 1){
+                RuleSatisfyData first = allRulesSatisfySorted.get(0);
+                RuleSatisfyData second = allRulesSatisfySorted.get(1);
+//                TODO:　校验排序
+                if (!first.satisfy && first.pass > second.pass) {
+                    allCurrentFrameWarnings.addAll(first.warnings);
+                }
+
+            }
+
+            allRulesSatisfySorted.stream().filter(warningsData ->
+                    warningsData.warnings.stream().filter(warning ->
+                            warning.triggeredWhenRuleMet).count() != 0).forEach(warningsData -> {
+                allCurrentFrameWarnings.addAll(warningsData.warnings);
+            });
+        }
+
+        if (!violateRulesTransformSatisfy.stream().filter( satisfy -> {
+            return satisfy.satisfy && !satisfy.warnings.stream().filter(warning -> {
+                return warning.triggeredWhenRuleMet;
+            }).collect(Collectors.toList()).isEmpty();
+        } ).collect(Collectors.toList()).isEmpty()) {
+            allCurrentFrameWarnings.removeIf(warning -> {
+                return warning.changeStateClear;
+            } );
+        }
+
+
+        //        计分逻辑　
+        List<RuleSatisfyData> scoreRulesTransformSatisfy = transforms.map( transform -> {
+            Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
+
+            if (toState != null && transform.from == currentStateTime.stateId) {
+                nextState = toState.get();
+                RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.SCORE, stateTimeHistory, poseMap, objects, frameSize);
+
+                if (satisfy.satisfy) {
+
+                    if (!inCheckingStatesTimer.containsKey(toState.get().name)){
+                        inCheckingStatesTimer.put(toState.get().name, checkStateTimer(toState.get(), currentTime, toState.get().checkCycle, poseMap, null));
+                    }
+                }
+
+                if (inCheckingStatesTimer.containsKey(toState.get().name)) {
+                    if (inCheckingStateHistory.containsKey(toState.get().name)) {
+                        inCheckingStateHistory.get(toState.get().name).add(satisfy.satisfy);
+                    }else{
+                        inCheckingStateHistory.put(toState.get().name, Lists.newArrayList(satisfy.satisfy));
+                    }
+                }
+
+                return satisfy;
+            }
+            return new RuleSatisfyData(false, new HashSet<>(), 0 ,0);
+        }).collect(Collectors.toList());
+
+
+        if (scoreRulesTransformSatisfy.size() == 1) {
+            allCurrentFrameWarnings.addAll(scoreRulesTransformSatisfy.get(0).warnings);
+        } else if (scoreRulesTransformSatisfy.size() > 1) {
+            List<RuleSatisfyData> allRulesSatisfySorted = scoreRulesTransformSatisfy.stream().
+                    sorted(Comparator.comparing(RuleSatisfyData::getPass).reversed()).collect(Collectors.toList());
+            if (allRulesSatisfySorted.size() > 1){
+                RuleSatisfyData first = allRulesSatisfySorted.get(0);
+                RuleSatisfyData second = allRulesSatisfySorted.get(1);
+//                TODO:　校验排序
+                if (!first.satisfy && first.pass > second.pass) {
+                    allCurrentFrameWarnings.addAll(first.warnings);
+                }
+
+            }
+
+            allRulesSatisfySorted.stream().filter(warningsData ->
+                    warningsData.warnings.stream().filter(warning ->
+                            warning.triggeredWhenRuleMet).count() != 0).forEach(warningsData -> {
+                allCurrentFrameWarnings.addAll(warningsData.warnings);
+            });
+        }
+
+        if (!scoreRulesTransformSatisfy.stream().filter( satisfy -> {
+            return satisfy.satisfy && !satisfy.warnings.stream().filter(warning -> {
+                return warning.triggeredWhenRuleMet;
+            }).collect(Collectors.toList()).isEmpty();
+        } ).collect(Collectors.toList()).isEmpty()) {
+            allCurrentFrameWarnings.removeIf(warning -> {
+                return warning.changeStateClear;
+            } );
+        }
+
+        allCurrentFrameWarnings.removeIf(warning -> {
+            return warning.content == "";
+        });
+
+        updateWarnings(currentTime, allCurrentFrameWarnings);
+
+        if (currentTime > lastTime) {
+            lastTime = currentTime;
+        }
     }
-
-
-
-
-
 
 }
