@@ -20,7 +20,7 @@ class ScoreTime {
     int stateId;
     double time;
     boolean valid;
-    Map<LandmarkType, Point3F> poseMap;
+    Map<LandmarkType, Point3F> poseMap = new EnumMap<>(LandmarkType.class);
     Optional<Observation> object;
 
     public ScoreTime(int stateId, double time, boolean valid, Map<LandmarkType, Point3F> poseMap, Optional<Observation> object) {
@@ -91,7 +91,7 @@ public class Sporter {
 
         if (Lists.newArrayList(InteractionType.MultipleChoice,
                 InteractionType.SingleChoice).contains(sport.interactionType) &&
-                question != null) {
+                !question.equals(Optional.empty())) {
             List<FixedArea> fixedAreas = new ArrayList();
             for (int i = 0; i < question.get().choices.size(); i++) {
                 if (this.answerSet.contains(i)) {
@@ -186,7 +186,7 @@ public class Sporter {
     public boolean orderTouchStart = false;
 
     StateTime currentStateTime = new StateTime(SportState.startState().id, 0,
-            new HashMap<LandmarkType, Point3F>(), null);
+            new EnumMap<LandmarkType, Point3F>(LandmarkType.class), Optional.empty());
 
     public void currentStateTimeSetted() {
         allStateTimeHistory.add(
@@ -225,7 +225,7 @@ public class Sporter {
                                 new ScoreTime(currentStateTime.stateId, currentStateTime.time, true, currentStateTime.poseMap, currentStateTime.object)
                         );
                     }
-                    this.question = null;
+                    this.question = Optional.empty();
                     this.answerSet.clear();
                 } else if (Lists.newArrayList(
                         SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id,
@@ -252,7 +252,7 @@ public class Sporter {
                         }
                     }
 
-                    this.question = null;
+                    this.question = Optional.empty();
                     this.answerSet.clear();
                 }  else if (Lists.newArrayList(
                         SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id,
@@ -283,22 +283,26 @@ public class Sporter {
                             );
                         }
                         currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                        currentStateTimeSetted();
                         orderTouchStart =false;
                     }
 
                     if (this.answerSet.size() == 1) {
                         if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id))){
                             currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            currentStateTimeSetted();
                             orderTouchStart =false;
                         }
                     } else if (this.answerSet.size() == 2) {
                         if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id, SportState.interAction_b().id))){
                             currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            currentStateTimeSetted();
                             orderTouchStart =false;
                         }
                     } else if (this.answerSet.size() == 3) {
                         if (!this.answerSet.equals(Sets.newHashSet(SportState.interAction_a().id, SportState.interAction_b().id, SportState.interAction_c().id))){
                             currentStateTime = new StateTime(SportState.startState().id, currentStateTime.time, currentStateTime.poseMap, currentStateTime.object);
+                            currentStateTimeSetted();
                             orderTouchStart =false;
                         }
                     }
@@ -323,8 +327,10 @@ public class Sporter {
                             scoreTimes.add(
                                     new ScoreTime(currentStateTime.stateId, currentStateTime.time,true, currentStateTime.poseMap, currentStateTime.object)
                             );
+                            scoreTimesSetted();
                         } else {
                             scoreTimes.addAll(timerScoreTimes);
+                            scoreTimesSetted();
                         }
                     }
 
@@ -361,9 +367,9 @@ public class Sporter {
 //            TODO: state change
             Optional<SportState> currentState = sport.findFirstStateByStateId(currentStateTime.stateId);
 
-            if (currentState != null) {
+            if (!currentState.equals(Optional.empty())) {
                 Optional<Integer> directToStateId = currentState.get().directToStateId;
-                if (directToStateId != null && directToStateId.get() != SportState.endState().id && directToStateId.get() != -100) {
+                if (!directToStateId.equals(Optional.empty()) && directToStateId.get() != SportState.endState().id && directToStateId.get() != -100) {
                     this.currentStateTime = new StateTime(
                             directToStateId.get(),
                             currentStateTime.time,
@@ -372,6 +378,8 @@ public class Sporter {
                             currentStateTime.dynamicObjectsMaps,
                             currentStateTime.dynamicPoseMaps
                     );
+                    currentStateTimeSetted();
+
                 }
             }
         }
@@ -384,7 +392,6 @@ public class Sporter {
         }
         );
     }
-
 
     SportState nextState = SportState.startState();
     List<ScoreTime> scoreTimes = new ArrayList<>();
@@ -400,6 +407,7 @@ public class Sporter {
             currentStateTime = new StateTime(
                     -1, lastScoreTime.time, lastScoreTime.poseMap, lastScoreTime.object
             );
+            currentStateTimeSetted();
         }
     }
     List<ScoreTime> interactionScoreTimes = new ArrayList<>();
@@ -422,10 +430,12 @@ public class Sporter {
                 if (last_1.time - last_2.time > state.checkCycle + 0.5) {
                     timerScoreTimes.clear();
                     timerScoreTimes.add(last_1);
+                    timerScoreTimesSetted();
                 }
             } else {
                 timerScoreTimes.clear();
                 timerScoreTimes.add(last_1);
+                timerScoreTimesSetted();
             }
         } else if (sport.sportDiscrete == SportPeriod.Discrete && timerScoreTimes.size() > 1) {
             last_1 = timerScoreTimes.get(timerScoreTimes.size()-1);
@@ -433,17 +443,20 @@ public class Sporter {
             if (last_2.stateId != last_1.stateId) {
                 timerScoreTimes.clear();
                 timerScoreTimes.add(last_1);
+                timerScoreTimesSetted();
             }
 
         }
 
         if (timerScoreTimes.size() == state.keepTime) {
             currentStateTime = new StateTime(state.id, last_1.time, last_1.poseMap, last_1.object);
+            currentStateTimeSetted();
+
         }
     }
 
     List<StateTime> stateTimeHistory = Lists.newArrayList(new StateTime(SportState.startState().id, 0,
-            new HashMap<>(), null));
+            new HashMap<>(), Optional.empty()));
 
     Map<Warning, Timer> cancelableWarningMap = new HashMap<>();
 
@@ -511,6 +524,7 @@ public class Sporter {
                     timerScoreTimes.add(
                             new ScoreTime(state.id, time, true, poseMap, object)
                     );
+                    timerScoreTimesSetted();
                     nextStatePreview = state;
 
                 }
@@ -543,7 +557,7 @@ public class Sporter {
                 return object.label == objectLabel;
             }).findFirst();
 
-            if (collectedObject != null) {
+            if (!collectedObject.equals(Optional.empty())) {
                 Observation collectedObject_ = collectedObject.get();
                 if (!stateTimeHistory.get(index).dynamicObjectsMaps.containsKey(objectLabel)) {
                     stateTimeHistory.get(index).dynamicObjectsMaps.put(objectLabel, new ExtremeObject(collectedObject_));
@@ -679,15 +693,16 @@ public class Sporter {
         Set<Warning> allCurrentFrameWarnings = new HashSet<>();
 
         if (currentStateTime.time > 1 && currentTime - currentStateTime.time > sport.scoreTimeLimit) {
-            currentStateTime = new StateTime(SportState.startState().id, currentTime, poseMap, null);
+            currentStateTime = new StateTime(SportState.startState().id, currentTime, poseMap, Optional.empty());
+            currentStateTimeSetted();
 
             allCurrentFrameWarnings.add(new Warning("状态变换间隔太久", true, 0));
         }
 
-        Stream<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from);
-        List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.map( transform -> {
+        List<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from).collect(Collectors.toList());
+        List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.stream().map( transform -> {
             Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
-            if (toState != null) {
+            if (!toState.equals(Optional.empty())) {
                 RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.VIOLATE, stateTimeHistory, poseMap, objects, frameSize);
                 return satisfy;
             }
@@ -722,20 +737,26 @@ public class Sporter {
             }).collect(Collectors.toList()).isEmpty();
         } ).collect(Collectors.toList()).isEmpty()) {
             allCurrentFrameWarnings.removeIf(warning -> {
-                return warning.changeStateClear;
+                if (!warning.changeStateClear.equals(Optional.empty())) {
+                    return warning.changeStateClear.get();
+
+                }else {
+                    return false;
+                }
             } );
         }
 
 //        计分逻辑　
-        List<RuleSatisfyData> scoreRulesTransformSatisfy = transforms.map( transform -> {
+        List<RuleSatisfyData> scoreRulesTransformSatisfy = transforms.stream().map( transform -> {
             Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
 
-            if (toState != null && transform.from == currentStateTime.stateId) {
+            if (!toState.equals(Optional.empty()) && transform.from == currentStateTime.stateId) {
                 nextState = toState.get();
                 RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.SCORE, stateTimeHistory, poseMap, objects, frameSize);
 
                 if (satisfy.satisfy) {
-                    currentStateTime = new StateTime(toState.get().id, currentTime, poseMap, null);
+                    currentStateTime = new StateTime(toState.get().id, currentTime, poseMap, Optional.empty());
+                    currentStateTimeSetted();
                 }
 
                 return satisfy;
@@ -772,7 +793,12 @@ public class Sporter {
             }).collect(Collectors.toList()).isEmpty();
         } ).collect(Collectors.toList()).isEmpty()) {
             allCurrentFrameWarnings.removeIf(warning -> {
-                return warning.changeStateClear;
+                if (!warning.changeStateClear.equals(Optional.empty())) {
+                    return warning.changeStateClear.get();
+
+                }else {
+                    return false;
+                }
             } );
         }
 
@@ -858,7 +884,12 @@ public class Sporter {
             }).collect(Collectors.toList()).isEmpty();
         } ).collect(Collectors.toList()).isEmpty()) {
             allCurrentFrameWarnings.removeIf(warning -> {
-                return warning.changeStateClear;
+                if (!warning.changeStateClear.equals(Optional.empty())) {
+                    return warning.changeStateClear.get();
+
+                }else {
+                    return false;
+                }
             } );
         }
 
@@ -901,6 +932,7 @@ public class Sporter {
         if (lastTime > currentTime) {
             return;
         }
+        System.out.println(2);
 
         if (!sport.selectedLandmarkTypes.isEmpty()) {
             updateCurrentStateLandmarkBounds(poseMap, sport.selectedLandmarkTypes);
@@ -911,10 +943,10 @@ public class Sporter {
 
         Set<Warning> allCurrentFrameWarnings = new HashSet<>();
 
-        Stream<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from);
-        List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.map( transform -> {
+        List<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from).collect(Collectors.toList());
+        List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.stream().map( transform -> {
             Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
-            if (toState != null) {
+            if (!toState.equals(Optional.empty())) {
                 RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.VIOLATE, stateTimeHistory, poseMap, objects, frameSize);
                 return satisfy;
             }
@@ -949,16 +981,21 @@ public class Sporter {
             }).collect(Collectors.toList()).isEmpty();
         } ).collect(Collectors.toList()).isEmpty()) {
             allCurrentFrameWarnings.removeIf(warning -> {
-                return warning.changeStateClear;
+                if (!warning.changeStateClear.equals(Optional.empty())) {
+                    return warning.changeStateClear.get();
+
+                }else {
+                    return false;
+                }
             } );
         }
 
 
         //        计分逻辑　
-        List<RuleSatisfyData> scoreRulesTransformSatisfy = transforms.map( transform -> {
+        List<RuleSatisfyData> scoreRulesTransformSatisfy = transforms.stream().map( transform -> {
             Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
 
-            if (toState != null && transform.from == currentStateTime.stateId) {
+            if (!toState.equals(Optional.empty()) && transform.from == currentStateTime.stateId) {
                 nextState = toState.get();
                 RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.SCORE, stateTimeHistory, poseMap, objects, frameSize);
 
@@ -1011,7 +1048,12 @@ public class Sporter {
             }).collect(Collectors.toList()).isEmpty();
         } ).collect(Collectors.toList()).isEmpty()) {
             allCurrentFrameWarnings.removeIf(warning -> {
-                return warning.changeStateClear;
+                if (!warning.changeStateClear.equals(Optional.empty())) {
+                    return warning.changeStateClear.get();
+
+                }else {
+                    return false;
+                }
             } );
         }
 

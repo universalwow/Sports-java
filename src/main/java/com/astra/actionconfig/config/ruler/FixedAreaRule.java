@@ -6,6 +6,7 @@ import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkInArea;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -17,7 +18,7 @@ import java.util.Set;
 public class FixedAreaRule {
     public String id = ""; //
     public RuleClass ruleClass = RuleClass.FixedArea;//
-    public List<LandmarkInArea> landmarkInFixedArea;
+    public List<LandmarkInArea> landmarkInFixedArea = Lists.newArrayList();
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
                                       Map<LandmarkType, Point3F> poseMap,

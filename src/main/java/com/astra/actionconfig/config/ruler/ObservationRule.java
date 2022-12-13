@@ -9,6 +9,7 @@ import com.astra.actionconfig.config.ruler.observationitem.ObjectToLandmark;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToObject;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateAngle;
 import com.astra.actionconfig.config.ruler.observationitem.ObjectToStateDistance;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.*;
@@ -24,11 +25,11 @@ public class ObservationRule {
     public ObjectLabel objectLabel;
     public RuleClass ruleClass = RuleClass.Observation;
 
-    public List<ObjectToLandmark> objectToLandmark;
-    public List<ObjectToObject> objectToObject;
-    public List<ObjectToStateAngle> objectToStateAngle;
+    public List<ObjectToLandmark> objectToLandmark = Lists.newArrayList();
+    public List<ObjectToObject> objectToObject = Lists.newArrayList();
+    public List<ObjectToStateAngle> objectToStateAngle = Lists.newArrayList();
 
-    public List<ObjectToStateDistance> objectToStateDistance;
+    public List<ObjectToStateDistance> objectToStateDistance = Lists.newArrayList();
 
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
@@ -45,7 +46,7 @@ public class ObservationRule {
 
                             Optional<Observation> selectedObject = objects.stream()
                                     .filter(object -> object.label == next.fromPosition.id).findFirst();
-                            if (selectedObject != null) {
+                            if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(poseMap, selectedObject.get());
                             }
 
@@ -80,7 +81,7 @@ public class ObservationRule {
                             Optional<Observation> selectedToObject = objects.stream()
                                     .filter(object -> object.label == next.toPosition.id).findFirst();
 
-                            if (selectedFromObject != null && selectedToObject != null) {
+                            if (!selectedFromObject.equals(Optional.empty()) && !selectedToObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(poseMap, selectedFromObject.get(), selectedToObject.get());
                             }
 
@@ -112,7 +113,7 @@ public class ObservationRule {
 
                             Optional<Observation> selectedObject = objects.stream()
                                     .filter(object -> object.label == next.fromPosition.id).findFirst();
-                            if (selectedObject != null) {
+                            if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
                             }
 
@@ -144,7 +145,7 @@ public class ObservationRule {
 
                             Optional<Observation> selectedObject = objects.stream()
                                     .filter(object -> object.label == next.fromPosition.id).findFirst();
-                            if (selectedObject != null) {
+                            if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
                             }
 

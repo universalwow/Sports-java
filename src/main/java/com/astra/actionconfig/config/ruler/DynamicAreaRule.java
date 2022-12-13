@@ -6,6 +6,7 @@ import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkInArea;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -22,7 +23,7 @@ enum  RuleClass {
 public class DynamicAreaRule {
     public String id; //
     public RuleClass ruleClass = RuleClass.DynamicArea;//
-    public List<LandmarkInArea> landmarkInDynamicArea; //猜测
+    public List<LandmarkInArea> landmarkInDynamicArea = Lists.newArrayList(); //猜测
 
     public void generateDynamicArea(String areaId, List<Point2F> area) {
         for (int i = 0; i < landmarkInDynamicArea.size(); i++) {

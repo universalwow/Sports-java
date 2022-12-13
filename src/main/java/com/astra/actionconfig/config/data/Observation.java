@@ -24,7 +24,7 @@ public class Observation {
 
     public Point3F pointOf(ObjectPosition position) {
         Rectangle rect = rectangle();
-        Point3F point = new Point3F();
+        Point3F point = new Point3F(0.,0.,0.);
         switch (position) {
 
             case topLeft:

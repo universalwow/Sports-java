@@ -47,17 +47,17 @@ public class Sport {
 
     //下面是计分相关的设置
     public int scoreTimeLimit = 2; //
-    public List<List<Integer>> scoreStateSequence; // 含义待定
+    public List<List<Integer>> scoreStateSequence = Lists.newArrayList();; // 含义待定
 
     //下面是状态的定义
-    public List<SportStateTransform> stateTransForm; // 含义待定
-    public List<ViolateStateSequence> violateStateSequence; // 含义待定
-    public List<SportState> states; // 含义待定
+    public List<SportStateTransform> stateTransForm = Lists.newArrayList();; // 含义待定
+    public List<ViolateStateSequence> violateStateSequence = Lists.newArrayList();; // 含义待定
+    public List<SportState> states = Lists.newArrayList();; // 含义待定
 
     //下面是动态区域定义
     public int dynamicAreaNumber = 3; //动态区域数量
-    public List<DynamicArea> dynamicAreas; // 含义待定
-    public List<FixedArea> fixedAreas; // 固定区域
+    public List<DynamicArea> dynamicAreas = Lists.newArrayList();; // 含义待定
+    public List<FixedArea> fixedAreas = Lists.newArrayList();; // 固定区域
 
     //下面是交互方式的描述
     public InteractionType interactionType;  //出现值 "None",此处不确定是否为对象
@@ -67,10 +67,10 @@ public class Sport {
     public List<List<Integer>> interactionScoreStateSequence = Lists.newArrayList(); // 含义待定
 
     //下面两个，没有数据，暂时不清楚其格式
-    public List<String> collectedObjects; //
-    public List<LandmarkType> selectedLandmarkTypes; //
+    public List<String> collectedObjects = Lists.newArrayList();; //
+    public List<LandmarkType> selectedLandmarkTypes = Lists.newArrayList();; //
 
-    public List<Question> questions; //
+    public List<Question> questions = Lists.newArrayList();; //
 
 
     public Optional<SportState> findFirstStateByStateId(int stateId) {
@@ -80,7 +80,7 @@ public class Sport {
     }
 
     public Optional<Integer> findFirstDynamicAreaIndex(String areaId) {
-        Optional<Integer> index = null;
+        Optional<Integer> index = Optional.empty();
         for (int i = 0; i < dynamicAreas.size(); i++) {
             if (dynamicAreas.get(i).id == areaId) {
                 index = Optional.of(i);

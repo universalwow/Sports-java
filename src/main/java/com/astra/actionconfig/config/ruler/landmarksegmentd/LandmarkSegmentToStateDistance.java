@@ -42,8 +42,8 @@ public class LandmarkSegmentToStateDistance {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             LandmarkSegment fromSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
             LandmarkSegment toSegment = new LandmarkSegment(
-                    new Landmark(fromSegment.startLandmark.landmarkType, new Point3F()),
-                    new Landmark(fromSegment.endLandmark.landmarkType, new Point3F())
+                    new Landmark(fromSegment.startLandmark.landmarkType, new Point3F(0.,0.,0.)),
+                    new Landmark(fromSegment.endLandmark.landmarkType, new Point3F(0.,0.,0.))
             );
 
 

@@ -38,7 +38,7 @@ public class LandmarkToStateDistance {
         if (toStateTimes.size() > 0) {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             Landmark fromLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(poseMap);
-            Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F());
+            Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F(0.,0.,0.));
 
             if (isRelativeToExtremeDirection) {
                 switch (extremeDirection) {

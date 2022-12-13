@@ -7,6 +7,7 @@ import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.config.ruler.RuleSatisfyData;
 import com.astra.actionconfig.config.ruler.Rules;
 import com.astra.actionconfig.config.ruler.StateTime;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.*;
@@ -23,15 +24,15 @@ public class SportState {
     public int checkCycle = 1;
     public int keepTime = 5;
     public float passingRate = 0.8f;
-    public Optional<Integer> directToStateId;
+    public Optional<Integer> directToStateId = Optional.of(-100);
     public Optional<Double> transFormTimeLimit;
 
-    public List<LandmarkSegment> landmarkSegments;
+    public List<LandmarkSegment> landmarkSegments = Lists.newArrayList();
 
-    public List<Observation> objects;
-    public List<Rules> scoreRules;
+    public List<Observation> objects = Lists.newArrayList();
+    public List<Rules> scoreRules = Lists.newArrayList();
     //下面两个没有数据
-    public List<Rules> violateRules;
+    public List<Rules> violateRules = Lists.newArrayList();
 
     public SportState(int id, String name, String description) {
         this.id = id;
@@ -157,7 +158,7 @@ public class SportState {
                         (result, next) -> {
 
                             RuleSatisfyData satisfy = next.allSatisfy(stateTimeHistory ,poseMap, objects, frameSize);
-                            Set warningSet = (Set) (satisfy.warnings.stream().peek(warning -> warning.isScoreWarning = ruleType == RuleType.SCORE
+                            Set warningSet =  new HashSet(satisfy.warnings.stream().peek(warning -> warning.isScoreWarning = Optional.of(ruleType == RuleType.SCORE)
                             ).collect(Collectors.toList()));
 
                             if (result.total == 0 && satisfy.total == 0) {

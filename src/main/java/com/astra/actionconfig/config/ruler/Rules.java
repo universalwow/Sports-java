@@ -5,6 +5,7 @@ import com.astra.actionconfig.config.data.Point2F;
 import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -16,15 +17,15 @@ import java.util.Set;
 public class Rules {
     public String id = "";
     public String description = "";
-    public List<DynamicAreaRule> dynamicAreaRules;  //此处应没数据，故猜测与fixedAreaRulers格式相同
-    public List<FixedAreaRule> fixedAreaRules;
+    public List<DynamicAreaRule> dynamicAreaRules = Lists.newArrayList(); //此处应没数据，故猜测与fixedAreaRulers格式相同
+    public List<FixedAreaRule> fixedAreaRules = Lists.newArrayList();
 
     //下面两个没有数据，格式为猜测
-    public List<LandmarkRule> landmarkRules;
-    public List<LandmarkSegmentRule> landmarkSegmentRules;
+    public List<LandmarkRule> landmarkRules = Lists.newArrayList();
+    public List<LandmarkSegmentRule> landmarkSegmentRules = Lists.newArrayList();
 
     //ObservationRuler未定义完全
-    public List<ObservationRule> observationRules;
+    public List<ObservationRule> observationRules = Lists.newArrayList();
 
     public void gnerateDynamicArea(String areaId, List<Point2F> area) {
         for (int i = 0; i < dynamicAreaRules.size(); i++) {

@@ -7,6 +7,7 @@ import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegmentType;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.config.ruler.landmarksegmentd.*;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -19,11 +20,11 @@ public class LandmarkSegmentRule {
     public LandmarkSegmentType landmarkSegmentType;
     public RuleClass ruleClass = RuleClass.LandmarkSegment;
     public String id = "";
-    public List<AngleToLandmarkSegment> angleToLandmarkSegment;
-    public List<LandmarkSegmentAngle> landmarkSegmentAngle;
-    public List<LandmarkSegmentLength> landmarkSegmentLength;
-    public List<LandmarkSegmentToStateAngle> landmarkSegmentToStateAngle;
-    public List<LandmarkSegmentToStateDistance> landmarkSegmentToStateDistance;
+    public List<AngleToLandmarkSegment> angleToLandmarkSegment = Lists.newArrayList();
+    public List<LandmarkSegmentAngle> landmarkSegmentAngle = Lists.newArrayList();
+    public List<LandmarkSegmentLength> landmarkSegmentLength = Lists.newArrayList();
+    public List<LandmarkSegmentToStateAngle> landmarkSegmentToStateAngle = Lists.newArrayList();
+    public List<LandmarkSegmentToStateDistance> landmarkSegmentToStateDistance = Lists.newArrayList();
 
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
