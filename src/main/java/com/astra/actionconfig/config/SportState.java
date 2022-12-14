@@ -21,9 +21,9 @@ public class SportState {
     public String description = "";
     public PngImage image;
     public Optional<HumanPose> humanPose;
-    public int checkCycle = 1;
+    public double checkCycle = 1;
     public int keepTime = 5;
-    public float passingRate = 0.8f;
+    public double passingRate = 0.8f;
     public Optional<Integer> directToStateId = Optional.of(-100);
     public Optional<Double> transFormTimeLimit;
 

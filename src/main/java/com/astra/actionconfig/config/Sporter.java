@@ -54,8 +54,8 @@ class WarningData {
 
 public class Sporter {
     UUID id = UUID.randomUUID();
-    String name;
-    Sport sport;
+    public String name;
+    public Sport sport;
 
     public Sporter(String name, Sport sport) {
         this.name = name;
@@ -180,13 +180,18 @@ public class Sporter {
     }
 
     List<ScoreTime> allStateTimeHistory = new ArrayList<ScoreTime>();
-    SportState nextStatePreview = SportState.startState();
+    public SportState nextStatePreview = SportState.startState();
     public Optional<Question> question;
     public Set<Integer> answerSet = new HashSet<Integer>();
     public boolean orderTouchStart = false;
 
     StateTime currentStateTime = new StateTime(SportState.startState().id, 0,
             new EnumMap<LandmarkType, Point3F>(LandmarkType.class), Optional.empty());
+
+    public SportState getCurrentState() {
+
+        return sport.findFirstStateByStateId(currentStateTime.stateId).get();
+    }
 
     public void currentStateTimeSetted() {
         allStateTimeHistory.add(
@@ -394,7 +399,7 @@ public class Sporter {
     }
 
     SportState nextState = SportState.startState();
-    List<ScoreTime> scoreTimes = new ArrayList<>();
+    public List<ScoreTime> scoreTimes = new ArrayList<>();
 
     private void scoreTimesSetted() {
         if (scoreTimes.isEmpty()) {
@@ -415,7 +420,7 @@ public class Sporter {
     Set delayWarnings = new HashSet<Warning>();
     Set noDelayWarnings = new HashSet<Warning>();
 
-    List<ScoreTime> timerScoreTimes = new ArrayList<>();
+    public List<ScoreTime> timerScoreTimes = new ArrayList<>();
 
     private void timerScoreTimesSetted() {
         if (timerScoreTimes.isEmpty()) {
@@ -540,6 +545,7 @@ public class Sporter {
     private Timer checkStateTimer(SportState state, double currentTime, double delay, Map<LandmarkType,Point3F> poseMap, Optional<Observation> object) {
         Timer timer = new Timer();
         CheckStateTimerTask task = new CheckStateTimerTask(timer, state, currentTime, poseMap, object);
+        System.out.println(String.format("delay %d", (long) (delay * 1000)));
         timer.schedule(task, (long) (delay * 1000));
         return timer;
 

@@ -11,6 +11,9 @@ import com.astra.actionconfig.utils.ConfigParseUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -33,6 +36,20 @@ public class SportsGround {
         );
         sporters = Lists.newArrayList(sporter);
         clearWarnings();
+    }
+
+    public void addSporter(String sportPath) {
+        File f = new File(sportPath);
+        InputStream is = null;
+        try {
+            is = new FileInputStream(f);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+//        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/2F883470-0223-41E1-B7F4-AD000E5337CE_2.0.json");
+        Sport sport = ConfigParseUtil.parseConfig(is, true);
+        addSporter(sport);
     }
 
     public void addSporter() {
