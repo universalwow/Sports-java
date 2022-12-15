@@ -783,7 +783,6 @@ public class Sporter {
                 if (!first.satisfy && first.pass > second.pass) {
                     allCurrentFrameWarnings.addAll(first.warnings);
                 }
-
             }
 
             allRulesSatisfySorted.stream().filter(warningsData ->
@@ -843,6 +842,7 @@ public class Sporter {
         List<RuleSatisfyData> scoreRulesSatisfy = allHasRuleStates.map( state -> {
 
             RuleSatisfyData satisfy = state.rulesSatisfy(RuleType.SCORE, stateTimeHistory, poseMap, objects, frameSize);
+            System.out.println(String.format("lanmarksegment angle %s/%s", satisfy.pass, satisfy.total));
 
             if (satisfy.satisfy) {
                 if (!inCheckingStatesTimer.containsKey(state.name)){
@@ -859,7 +859,7 @@ public class Sporter {
                 }
             }
 
-            return new RuleSatisfyData(false, new HashSet<>(), 0 ,0);
+            return satisfy;
         }).collect(Collectors.toList());
 
         if (scoreRulesSatisfy.size() == 1) {
@@ -905,9 +905,11 @@ public class Sporter {
             }else {
                 List<RuleSatisfyData> allRulesSatisfySorted = scoreRulesSatisfy.stream().
                         sorted(Comparator.comparing(RuleSatisfyData::getPass).reversed()).collect(Collectors.toList());
+
                 if (allRulesSatisfySorted.size() > 1){
                     RuleSatisfyData first = allRulesSatisfySorted.get(0);
                     RuleSatisfyData second = allRulesSatisfySorted.get(1);
+                    System.out.println(String.format("%s first %s/%s second %s/%s", first.satisfy, first.pass, first.total, second.pass,second.total));
 //                TODO:　校验排序
                     if (!first.satisfy && first.pass > second.pass) {
                         allCurrentFrameWarnings.addAll(first.warnings);

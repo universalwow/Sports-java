@@ -66,6 +66,7 @@ public class Rules {
                                 0, 0),
                         (result, next) -> {
                             RuleSatisfyData satisfy = next.allSatisfy(stateTimeHistory ,poseMap, objects, frameSize);
+
                             Set<Warning> newWarnings = result.warnings;
                             newWarnings.addAll(satisfy.warnings);
 
@@ -79,6 +80,7 @@ public class Rules {
                         }, (a, b) -> null
 
                 );
+
 
         RuleSatisfyData observationRulesRulesSatisfies =
                 observationRules.stream().reduce(
