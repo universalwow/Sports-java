@@ -774,8 +774,12 @@ public class Sporter {
         if (scoreRulesTransformSatisfy.size() == 1) {
             allCurrentFrameWarnings.addAll(scoreRulesTransformSatisfy.get(0).warnings);
         } else if (scoreRulesTransformSatisfy.size() > 1) {
+
             List<RuleSatisfyData> allRulesSatisfySorted = scoreRulesTransformSatisfy.stream().
                     sorted(Comparator.comparing(RuleSatisfyData::getPass).reversed()).collect(Collectors.toList());
+            System.out.println(String.format("satisfy %s", allRulesSatisfySorted));
+            System.out.println("--------------------------");
+
             if (allRulesSatisfySorted.size() > 1){
                 RuleSatisfyData first = allRulesSatisfySorted.get(0);
                 RuleSatisfyData second = allRulesSatisfySorted.get(1);

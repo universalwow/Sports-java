@@ -161,7 +161,6 @@ public class SportState {
                             Set warningSet =  new HashSet(satisfy.warnings.stream().peek(warning -> warning.isScoreWarning = Optional.of(ruleType == RuleType.SCORE)
                             ).collect(Collectors.toList()));
 
-
                             if (result.total == 0 && satisfy.total == 0) {
                                 return new RuleSatisfyData(false, warningSet, satisfy.pass, satisfy.total);
                             } else if (result.total == 0 && satisfy.total !=0) {

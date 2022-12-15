@@ -59,6 +59,7 @@ public class Rules {
 
                 );
 
+
         RuleSatisfyData landmarkSegmentRulesSatisfies =
                 landmarkSegmentRules.stream().reduce(
                         new RuleSatisfyData(true,
