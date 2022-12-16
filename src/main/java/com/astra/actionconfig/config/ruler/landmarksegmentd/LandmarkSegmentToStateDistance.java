@@ -112,7 +112,7 @@ public class LandmarkSegmentToStateDistance {
             }
             Range<Double> range = range();
 
-            return ComplexRule.satisfyWithDirection(fromAxis, fromAxis, range, fromSegment, toSegment);
+            return ComplexRule.satisfyWithDirection2(fromAxis, fromAxis, range, fromSegment, toSegment);
         }else {
             return true;
         }

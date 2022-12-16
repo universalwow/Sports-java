@@ -39,6 +39,40 @@ public class ComplexRule {
         return satisfy;
     }
 
+    public static boolean satisfyWithDirection2(
+            CoordinateAxis fromAxis,
+            CoordinateAxis toAxis,
+            Range<Double> range,
+            LandmarkSegment fromSegment,
+            LandmarkSegment toSegment
+    ) {
+        boolean satisfy = false;
+        if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.X)) {
+            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceXWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.Y)) {
+            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceYWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.XY)) {
+            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distance());
+
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.X)) {
+            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distanceXWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.Y)) {
+            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distanceYWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.XY)) {
+            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distance());
+
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.X)) {
+            satisfy = range.contains(fromSegment.distance() / toSegment.distanceXWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.Y)) {
+            satisfy = range.contains(fromSegment.distance() / toSegment.distanceYWithDirection());
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.XY)) {
+            satisfy = range.contains(fromSegment.distance() / toSegment.distance());
+        }
+
+
+        return satisfy;
+    }
+
     public static boolean satisfyWithDirectionToObject(CoordinateAxis fromAxis,
                                                Range<Double> range,
                                                LandmarkSegment fromSegment, double relativeTo) {
