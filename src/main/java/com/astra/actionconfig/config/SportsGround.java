@@ -68,7 +68,7 @@ public class SportsGround {
 
     public void play(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
 
-
+        warnings.clear();
         for (int i = 0; i < sporters.size(); i++) {
             Sporter sporter = sporters.get(i);
 
@@ -78,7 +78,6 @@ public class SportsGround {
                             warnings.add((Warning) warning);
                         }
                     }
-
             );
 
             sporter.noDelayWarnings.forEach(warning -> {
@@ -131,48 +130,13 @@ public class SportsGround {
             poseMap.put(LandmarkType.LeftToe, new Point3F(455.92079162597656, 620.6178045272827, -0.043700456619262695));
             poseMap.put(LandmarkType.RightToe, new Point3F(898.8021087646484, 620.7042789459229, -0.05215098261833191));
 
-        
-//        poseMap.put(LandmarkType.RightElbow, new Point3F(378.3071279525757, 538.8972854614258, -0.001577141508460045)));
-//        poseMap.put(LandmarkType.LeftPinkyFinger, new Point3F(431.5408229827881, 664.5702362060547, -0.03371106386184693)));
-//
-//        poseMap.put(LandmarkType.RightEyeInner, new Point3F(397.4977111816406, 323.02207946777344, -0.03414697349071503)));
-//        poseMap.put(LandmarkType.RightEye, new Point3F(397.5790786743164, 323.7246322631836, -0.034150737524032596)));
-//        poseMap.put(LandmarkType.RightHip, new Point3F(389.1557836532593, 638.6297607421875, 0.0038138996809720994)));
-//        poseMap.put(LandmarkType.LeftEar, new Point3F(408.07878971099854, 340.3202819824219, -0.03102298974990845)));
-//        poseMap.put(LandmarkType.LeftEye, new Point3F(400.27570724487305, 324.9848175048828, -0.03646494150161743)));
-//        poseMap.put(LandmarkType.LeftShoulder, new Point3F(429.22884464263916, 436.7615509033203, -0.023721055686473848)));
-//        poseMap.put(LandmarkType.RightEar, new Point3F(402.61613845825195, 340.5696105957031, -0.0200445294380188)));
-//        poseMap.put(LandmarkType.MouthLeft, new Point3F(397.0344829559326, 358.6964416503906, -0.0336983323097229)));
-//        poseMap.put(LandmarkType.MouthRight, new Point3F(394.40385818481445, 358.2015609741211, -0.030552729964256287)));
-//        poseMap.put(LandmarkType.LeftElbow, new Point3F(434.60652351379395, 546.9325256347656, -0.02147688567638397)));
-//        poseMap.put(LandmarkType.RightAnkle, new Point3F(386.75737380981445, 931.1382293701172, 0.029906556010246277)));
-//        poseMap.put(LandmarkType.RightEyeOuter, new Point3F(397.7031469345093, 324.5520782470703, -0.03415963649749756)));
-//        poseMap.put(LandmarkType.LeftToe, new Point3F(407.6274061203003, 975.7364654541016, 0.00890396535396576)));
-//        poseMap.put(LandmarkType.LeftEyeOuter, new Point3F(401.63994312286377, 326.2969970703125, -0.03647010624408722)));
-//        poseMap.put(LandmarkType.RightThumb, new Point3F(375.04315853118896, 648.7305450439453, -0.013498300313949585)));
-//        poseMap.put(LandmarkType.LeftEyeInner, new Point3F(399.02227878570557, 323.7372589111328, -0.03645811975002289)));
-//        poseMap.put(LandmarkType.LeftThumb, new Point3F(426.3264799118042, 651.1165618896484, -0.03127295672893524)));
-//        poseMap.put(LandmarkType.Nose, new Point3F(394.22258377075195, 336.38065338134766, -0.03614669144153595)));
-//        poseMap.put(LandmarkType.LeftKnee, new Point3F(409.9720001220703, 802.2218322753906, 4.3038260191679E-4)));
-//        poseMap.put(LandmarkType.RightToe, new Point3F(377.7550220489502, 968.3370971679688, 0.016007739305496215)));
-//        poseMap.put(LandmarkType.LeftIndexFinger, new Point3F(428.61305236816406, 670.2887725830078, -0.037187105417251586)));
-//        poseMap.put(LandmarkType.LeftWrist, new Point3F(431.99469566345215, 638.8069534301758, -0.029819202423095704)));
-//        poseMap.put(LandmarkType.LeftAnkle, new Point3F(405.9341812133789, 932.8451538085938, 0.024083712697029115)));
-//        poseMap.put(LandmarkType.LeftHeel, new Point3F(404.71362590789795, 945.9996032714844, 0.025400498509407045)));
-//        poseMap.put(LandmarkType.RightHeel, new Point3F(388.3156728744507, 947.2075653076172, 0.031264898180961606)));
-//        poseMap.put(LandmarkType.RightShoulder, new Point3F(384.8539924621582, 433.49117279052734, -0.010223744809627533)));
-//        poseMap.put(LandmarkType.RightPinkyFinger, new Point3F(370.4822015762329, 656.8244934082031, -0.014342816174030304)));
-//        poseMap.put(LandmarkType.RightWrist, new Point3F(373.9418649673462, 631.3254547119141, -0.011365249007940292)));
-//        poseMap.put(LandmarkType.RightIndexFinger, new Point3F(372.6864194869995, 658.4451293945312, -0.01889760047197342)));
-//        poseMap.put(LandmarkType.LeftHip, new Point3F(411.9555473327637, 645.8351898193359, -0.0038031991571187973)));
-//        poseMap.put(LandmarkType.RightKnee, new Point3F(388.5319662094116, 791.5168762207031, 0.007666853070259094)));
-
         double currentTime = System.currentTimeMillis() / 1000;
         Point2F frameSize = new Point2F(720, 1280);
         List<Observation> objects = Lists.newArrayList();
 
         SportsGround ground = new SportsGround();
-        ground.addSporter();
+        ground.addSporter("path");
+//        ground.addSporter();
         ground.play(poseMap, objects, frameSize, currentTime);
 
         System.out.println("stop...............");

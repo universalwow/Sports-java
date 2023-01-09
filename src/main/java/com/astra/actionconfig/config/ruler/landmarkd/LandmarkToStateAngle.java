@@ -88,7 +88,7 @@ public class LandmarkToStateAngle {
                 toLandmark = this.fromLandmark.landmarkType.landmark(toStateTime.poseMap);
             }
 
-            LandmarkSegment fromSegment = new LandmarkSegment(fromLandmark, toLandmark);
+            LandmarkSegment fromSegment = new LandmarkSegment(toLandmark, fromLandmark);
 
             return range().contains(fromSegment.angle());
         }else {

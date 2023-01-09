@@ -20,6 +20,10 @@ public class Point3F {
         this.z = 0;
     }
 
+    public Point2F point2F() {
+        return new Point2F(this.x, this.y);
+    }
+
     public Vector2D vector2D() {
         return new Vector2D(this.x, this.y);
     }

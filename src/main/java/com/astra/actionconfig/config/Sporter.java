@@ -9,6 +9,7 @@ import com.astra.actionconfig.config.ruler.RuleSatisfyData;
 import com.astra.actionconfig.config.ruler.StateTime;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import lombok.Data;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,6 +37,7 @@ class ScoreTime {
     }
 }
 
+@Data
 class WarningData {
     Warning warning;
     int stateId;
@@ -417,7 +419,7 @@ public class Sporter {
     }
     List<ScoreTime> interactionScoreTimes = new ArrayList<>();
 
-    Set delayWarnings = new HashSet<Warning>();
+    Set<Warning> delayWarnings = Collections.synchronizedSet(new HashSet<Warning>());
     Set noDelayWarnings = new HashSet<Warning>();
 
     public List<ScoreTime> timerScoreTimes = new ArrayList<>();
@@ -463,7 +465,7 @@ public class Sporter {
     List<StateTime> stateTimeHistory = Lists.newArrayList(new StateTime(SportState.startState().id, 0,
             new HashMap<>(), Optional.empty()));
 
-    Map<Warning, Timer> cancelableWarningMap = new HashMap<>();
+    Map<Warning, Timer> cancelableWarningMap = Collections.synchronizedMap(new HashMap<>());
 
     List<WarningData> warningsData = new ArrayList<>();
 
@@ -479,10 +481,12 @@ public class Sporter {
         @Override
         public void run() {
             delayWarnings.add(warning.warning);
+//            System.out.println(String.format("warning------------------ %s", warning.warning.content));
             warningsData.add(warning);
             this.cancel();
             this.timer.cancel();
             this.timer.purge();
+            cancelableWarningMap.remove(warning.warning);
 
         }
 
@@ -495,8 +499,8 @@ public class Sporter {
         return new Timer();
     }
 
-    Map<String, List<Boolean>> inCheckingStateHistory = new HashMap<>();
-    Map<String, Timer> inCheckingStatesTimer = new HashMap<>();
+    Map<String, List<Boolean>> inCheckingStateHistory = Collections.synchronizedMap( new HashMap<>());
+    Map<String, Timer> inCheckingStatesTimer = Collections.synchronizedMap( new HashMap<>());
 
     class CheckStateTimerTask extends TimerTask {
         Timer timer;
@@ -637,22 +641,46 @@ public class Sporter {
         List<WarningData> totalWarnings = allCurrentFrameWarnings.stream().map(warning -> {
             return new WarningData(warning, currentStateTime.stateId, currentTime);
         }).collect(Collectors.toList());
-
-        List<Warning> cancelWarnings = cancelableWarningMap.keySet().stream().filter(warning -> {
+//不在当前提示中，全部删除
+        List<Warning> cancelWarnings = delayWarnings.stream().filter(warning -> {
             return !totalWarnings.stream().map(newWarning -> {
                 return newWarning.warning.content;
             }).collect(Collectors.toList()).contains(warning.content);
         }).collect(Collectors.toList());
+//不在当前提示中，全部删除
+        List<Warning> cancelWarnings1 = cancelableWarningMap.keySet().stream().filter(warning -> {
+            return !totalWarnings.stream().map(newWarning -> {
+                return newWarning.warning.content;
+            }).collect(Collectors.toList()).contains(warning.content);
+        }).collect(Collectors.toList());
+        System.out.println(String.format("-delayWarnings %s/%s", totalWarnings, cancelableWarningMap.keySet()));
 
         cancelWarnings.forEach(warning -> {
             if (cancelableWarningMap.containsKey(warning)) {
-                cancelableWarningMap.get(warning).cancel();
-                cancelableWarningMap.get(warning).purge();
+                Timer timer = cancelableWarningMap.get(warning);
+                timer.cancel();
+                timer.purge();
                 cancelableWarningMap.remove(warning);
             }
         });
 
+        cancelWarnings1.forEach(warning -> {
+            if (cancelableWarningMap.containsKey(warning)) {
+                Timer timer = cancelableWarningMap.get(warning);
+                timer.cancel();
+                timer.purge();
+                cancelableWarningMap.remove(warning);
+            }
+        });
+
+        System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings, cancelWarnings));
+
+        System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings.size(), cancelWarnings.size()));
         this.delayWarnings.removeAll(cancelWarnings);
+        this.delayWarnings.removeAll(cancelWarnings1);
+
+        System.out.println(String.format("delayWarnings * %s", this.delayWarnings.size()));
+
 
         totalWarnings.stream().filter(warningData -> {
             return  !cancelableWarningMap.keySet().stream().map(warning -> {

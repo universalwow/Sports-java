@@ -55,7 +55,7 @@ public class LandmarkToStateDistance {
                         break;
                     case MaxY:
                         toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY;
-
+                        System.out.println(String.format("max y %s/%s", toLandmark.position.x, toLandmark.position.y));
                         break;
                     case MinX_MinY:
                         toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX.x;
@@ -88,6 +88,7 @@ public class LandmarkToStateDistance {
 
             return ComplexRule.satisfyWithDirection(fromLandmarkToAxis.axis, toLandmarkSegmentToAxis.axis, this.range(), fromSegment, toSegment);
         }else {
+//            System.out.println(String.format("defaultSatisfy %s", defaultSatisfy));
             return defaultSatisfy;
         }
 

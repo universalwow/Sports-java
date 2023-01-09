@@ -6,7 +6,6 @@ import com.astra.actionconfig.config.Sport;
 import com.astra.actionconfig.config.SportState;
 import com.astra.actionconfig.config.data.PngImage;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StopWatch;
 
@@ -17,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j
+//@Slf4j
 public class ConfigParseUtil {
     private ConfigParseUtil() {
     }
@@ -39,7 +38,7 @@ public class ConfigParseUtil {
             reader.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-            log.error("parseConfig error, {}", ex.getMessage());
+//            log.error("parseConfig error, {}", ex.getMessage());
             return null;
         }
 
@@ -61,7 +60,7 @@ public class ConfigParseUtil {
         InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/fileyf1.json");
         Sport sport = parseConfig(is, true);
 
-        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
+//        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
     }
 
     public static void main(String[] args) {
