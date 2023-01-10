@@ -6,6 +6,9 @@ import com.astra.actionconfig.config.Sport;
 import com.astra.actionconfig.config.SportState;
 import com.astra.actionconfig.config.data.PngImage;
 
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -13,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-//@Slf4j
+@Slf4j
 public class ConfigParseUtil {
     private ConfigParseUtil() {
     }
@@ -35,7 +38,7 @@ public class ConfigParseUtil {
             reader.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-//            log.error("parseConfig error, {}", ex.getMessage());
+            log.error("parseConfig error, {}", ex.getMessage());
             return null;
         }
 
@@ -90,7 +93,7 @@ public class ConfigParseUtil {
         InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/12.json");
         Sport sport = parseConfig(is, true);
 
-//        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
+        log.info("[MainConfig entity]---, {}", sport.states.stream().filter( s -> s.id == 7).findFirst().get().objects);
     }
 
     public static void main(String[] args) throws IOException {
