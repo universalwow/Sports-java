@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.util.Optional;
 
-@Data
 public class FixedArea {
     public String id = "";
     public String content = "";
