@@ -23,6 +23,7 @@ public class LandmarkSegment {
         this.endLandmark = endLandmark;
     }
 
+    public LandmarkSegment(){}
 
     public LandmarkTypeSegment landmarkTypeSegment() {
         return new LandmarkTypeSegment(startLandmark.landmarkType, endLandmark.landmarkType);

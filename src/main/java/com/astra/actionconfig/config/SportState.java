@@ -40,6 +40,7 @@ public class SportState {
         this.description = description;
     }
 
+    public SportState(){}
 
     public static SportState interAction_1() {
         return new SportState(-1, "interAction_1", "interAction_1");
