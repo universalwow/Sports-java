@@ -112,7 +112,7 @@
     </dependencies>
 
     <build>
-        <resources>
+        <!--<resources>
             <resource>
                 <directory>${project.basedir}/src/main/resources/configjson</directory>
                 <filtering>false</filtering>
@@ -120,7 +120,7 @@
                     <exclude>*.json</exclude>
                 </excludes>
             </resource>
-        </resources>
+        </resources>-->
         <plugins>
 <!--            <plugin>-->
 <!--                <groupId>org.springframework.boot</groupId>-->

@@ -12,6 +12,7 @@ public class Landmark {
     public Point3F position;
     public Boolean selected = false;
 
+    public Landmark(){}
 
     public Landmark(LandmarkType landmarkType, Point3F position) {
         this.landmarkType = landmarkType;
