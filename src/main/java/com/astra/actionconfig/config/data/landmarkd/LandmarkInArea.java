@@ -55,7 +55,7 @@ public class LandmarkInArea {
     public boolean satisfy(Map<LandmarkType, Point3F> poseMap, Point2F frameSize) {
         Point3F landmarkPoint = poseMap.get(landmark.landmarkType);
         Point2F[] path = this.path(frameSize);
-        System.out.println(String.format("landmark type %s %s/%s - %s", landmark.landmarkType.toString(), landmarkPoint.x, landmarkPoint.y, UniPolygon.isInside(path, 3, landmarkPoint.point2F())));
+        System.out.println(String.format("landmark type %s  %s %s/%s - %s", path, landmark.landmarkType.toString(), landmarkPoint.x, landmarkPoint.y, UniPolygon.isInside(path, 3, landmarkPoint.point2F())));
         return UniPolygon.isInside(path, 3, landmarkPoint.point2F());
 //        return path.contains(landmarkPoint.x, landmarkPoint.y);
     }

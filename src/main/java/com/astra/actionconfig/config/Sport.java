@@ -10,6 +10,7 @@ import com.astra.actionconfig.config.data.state.ViolateStateSequence;
 import com.google.common.collect.Lists;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ enum InteractionType {
 }
 
 @Data
-public class Sport {
+public class Sport implements Serializable {
     public String id = ""; //编号
     public String name = ""; //名称
     public String description = ""; //描述

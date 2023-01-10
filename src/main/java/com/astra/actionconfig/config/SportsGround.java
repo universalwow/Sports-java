@@ -135,9 +135,9 @@ public class SportsGround {
         List<Observation> objects = Lists.newArrayList();
 
         SportsGround ground = new SportsGround();
-        ground.addSporter("path");
-//        ground.addSporter();
-        ground.play(poseMap, objects, frameSize, currentTime);
+//        ground.addSporter("path");
+////        ground.addSporter();
+//        ground.play(poseMap, objects, frameSize, currentTime);
 
         System.out.println("stop...............");
     }
