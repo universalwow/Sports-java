@@ -112,15 +112,15 @@
     </dependencies>
 
     <build>
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>${project.basedir}/src/main/resources/configjson</directory>-->
-<!--                <filtering>false</filtering>-->
-<!--                <excludes>-->
-<!--                    <exclude>*.json</exclude>-->
-<!--                </excludes>-->
-<!--            </resource>-->
-<!--        </resources>-->
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources/configjson</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>*.json</exclude>
+                </excludes>
+            </resource>
+        </resources>
 
         <plugins>
 <!--            <plugin>-->

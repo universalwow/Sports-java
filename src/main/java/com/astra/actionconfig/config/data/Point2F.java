@@ -13,4 +13,10 @@ public class Point2F {
         this.x = x;
         this.y = y;
     }
+
+    public String toString() {
+        return String.format("{\"x\": %f, \"y\": %f}", x, y);
+    }
+
+
 }

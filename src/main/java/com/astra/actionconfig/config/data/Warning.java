@@ -14,7 +14,7 @@ public class Warning {
     public Optional<Boolean> isScoreWarning;
     public Boolean triggeredWhenRuleMet;
 
-//    public Warning(){}
+    public Warning(){}
 
     public Warning(String content, boolean triggeredWhenRuleMet, double delayTime) {
         this.content = content;

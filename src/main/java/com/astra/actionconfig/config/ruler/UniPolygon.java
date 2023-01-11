@@ -23,6 +23,33 @@ public class UniPolygon
         return (val > 0) ? 1 : 2;
     }
 
+    public static boolean pointInPolygon(Point2F[] polygon, Point2F point) {
+
+        if (polygon.length < 3) {
+            return false;
+        }
+        //A point is in a polygon if a line from the point to infinity crosses the polygon an odd number of times
+        boolean odd = false;
+        // int totalCrosses = 0; // this is just used for debugging
+        //For each edge (In this case for each point of the polygon and the previous one)
+        for (int i = 0, j = polygon.length - 1; i < polygon.length; i++) { // Starting with the edge from the last to the first node
+            //If a line from the point into infinity crosses this edge
+            if (((polygon[i].y > point.y) != (polygon[j].y > point.y)) // One point needs to be above, one below our y coordinate
+                    // ...and the edge doesn't cross our Y corrdinate before our x coordinate (but between our x coordinate and infinity)
+                    && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+                // Invert odd
+                // System.out.println("Point crosses edge " + (j + 1));
+                // totalCrosses++;
+                odd = !odd;
+            }
+            //else {System.out.println("Point does not cross edge " + (j + 1));}
+            j = i;
+        }
+        // System.out.println("Total number of crossings: " + totalCrosses);
+        //If the number of crossings was odd, the point is in the polygon
+        return odd;
+    }
+
     public static boolean doIntersect(Point2F p1, Point2F q1, Point2F p2, Point2F q2)
     {
 
@@ -49,7 +76,7 @@ public class UniPolygon
         return false;
     }
 
-    public static boolean isInside(Point2F polygon[], int n, Point2F p)
+    public static boolean isInside(Point2F[] polygon, int n, Point2F p)
     {
         int INF = 10000;
         if (n < 3)
@@ -107,5 +134,28 @@ public class UniPolygon
         p = new Point2F(-1, 10);
         System.out.println("Point P(" + p.x + ", " + p.y
                 + ") lies inside polygon3: " + isInside(polygon3, n, p));
+
+
+//         [{"x":324.0,"y":1406.4},{"x":756.0,"y":1406.4},{"x":756.0,"y":1665.6},{"x":324.0,"y":1665.6}]  LeftAnkle 513.7883055210114/1547.4263763427734 - false
+//            [Ljava.lang.String;@130f889
+//        landmark type [{"x":324.0,"y":1406.4},{"x":756.0,"y":1406.4},{"x":756.0,"y":1665.6},{"x":324.0,"y":1665.6}]  RightAnkle 592.7315425872803/1562.0816802978516 - true
+//
+        Point2F polygon4[] = { new Point2F(324, 1406), new Point2F(756.0, 1406),
+                new Point2F(756.0, 1665), new Point2F(324.0, 1665)};
+        p = new Point2F(513, 1547);
+
+        System.out.println("Point P(" + p.x + ", " + p.y
+                + ") lies inside polygon4: " + pointInPolygon(polygon4, p));
+        p = new Point2F(592, 1562);
+
+        System.out.println("Point P(" + p.x + ", " + p.y
+                + ") lies inside polygon4: " + pointInPolygon(polygon4,  p));
+
+        p = new Point2F(324, 1407);
+
+        System.out.println("Point P(" + p.x + ", " + p.y
+                + ") lies inside polygon4: " + pointInPolygon(polygon4,  p));
+
     }
+
 }

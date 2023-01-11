@@ -420,7 +420,7 @@ public class Sporter {
     List<ScoreTime> interactionScoreTimes = new ArrayList<>();
 
     Set<Warning> delayWarnings = Collections.synchronizedSet(new HashSet<Warning>());
-    Set noDelayWarnings = new HashSet<Warning>();
+    Set noDelayWarnings = Collections.synchronizedSet(new HashSet<Warning>());
 
     public List<ScoreTime> timerScoreTimes = new ArrayList<>();
 
@@ -467,7 +467,7 @@ public class Sporter {
 
     Map<Warning, Timer> cancelableWarningMap = Collections.synchronizedMap(new HashMap<>());
 
-    List<WarningData> warningsData = new ArrayList<>();
+    List<WarningData> warningsData = Collections.synchronizedList(new ArrayList<>());
 
     class WarningTimerTask extends TimerTask {
         WarningData warning;
@@ -631,67 +631,72 @@ public class Sporter {
     double lastTime = 0;
 
     private void updateWarnings(double currentTime, Set<Warning> allCurrentFrameWarnings){
-        allCurrentFrameWarnings.forEach(warning -> {
-            if (warning.delayTime < 0.3) {
-                noDelayWarnings.add(warning);
-                warningsData.add(new WarningData(warning, currentStateTime.stateId, currentTime));
-            }
-        });
+        synchronized (cancelableWarningMap) {
+            allCurrentFrameWarnings.forEach(warning -> {
+                if (warning.delayTime < 0.3) {
+                    noDelayWarnings.add(warning);
+                    warningsData.add(new WarningData(warning, currentStateTime.stateId, currentTime));
+                }
+            });
 
-        List<WarningData> totalWarnings = allCurrentFrameWarnings.stream().map(warning -> {
-            return new WarningData(warning, currentStateTime.stateId, currentTime);
-        }).collect(Collectors.toList());
+            List<WarningData> totalWarnings = allCurrentFrameWarnings.stream().map(warning -> {
+                return new WarningData(warning, currentStateTime.stateId, currentTime);
+            }).collect(Collectors.toList());
 //不在当前提示中，全部删除
-        List<Warning> cancelWarnings = delayWarnings.stream().filter(warning -> {
-            return !totalWarnings.stream().map(newWarning -> {
-                return newWarning.warning.content;
-            }).collect(Collectors.toList()).contains(warning.content);
-        }).collect(Collectors.toList());
+            List<Warning> cancelWarnings = delayWarnings.stream().filter(warning -> {
+                return !totalWarnings.stream().map(newWarning -> {
+                    return newWarning.warning.content;
+                }).collect(Collectors.toList()).contains(warning.content);
+            }).collect(Collectors.toList());
 //不在当前提示中，全部删除
-        List<Warning> cancelWarnings1 = cancelableWarningMap.keySet().stream().filter(warning -> {
-            return !totalWarnings.stream().map(newWarning -> {
-                return newWarning.warning.content;
-            }).collect(Collectors.toList()).contains(warning.content);
-        }).collect(Collectors.toList());
-        System.out.println(String.format("-delayWarnings %s/%s", totalWarnings, cancelableWarningMap.keySet()));
+            List<Warning> cancelWarnings1 = cancelableWarningMap.keySet().stream().filter(warning -> {
+                return !totalWarnings.stream().map(newWarning -> {
+                    return newWarning.warning.content;
+                }).collect(Collectors.toList()).contains(warning.content);
+            }).collect(Collectors.toList());
+            System.out.println(String.format("-delayWarnings %s/%s", totalWarnings, cancelableWarningMap.keySet()));
 
-        cancelWarnings.forEach(warning -> {
-            if (cancelableWarningMap.containsKey(warning)) {
-                Timer timer = cancelableWarningMap.get(warning);
-                timer.cancel();
-                timer.purge();
-                cancelableWarningMap.remove(warning);
-            }
-        });
+            cancelWarnings.forEach(warning -> {
+                if (cancelableWarningMap.containsKey(warning)) {
+                    Timer timer = cancelableWarningMap.get(warning);
+                    timer.cancel();
+                    timer.purge();
+                    cancelableWarningMap.remove(warning);
+                }
+            });
 
-        cancelWarnings1.forEach(warning -> {
-            if (cancelableWarningMap.containsKey(warning)) {
-                Timer timer = cancelableWarningMap.get(warning);
-                timer.cancel();
-                timer.purge();
-                cancelableWarningMap.remove(warning);
-            }
-        });
+            cancelWarnings1.forEach(warning -> {
+                if (cancelableWarningMap.containsKey(warning)) {
+                    Timer timer = cancelableWarningMap.get(warning);
+                    timer.cancel();
+                    timer.purge();
+                    cancelableWarningMap.remove(warning);
+                }
+            });
 
-        System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings, cancelWarnings));
+            System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings, cancelWarnings));
 
-        System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings.size(), cancelWarnings.size()));
-        this.delayWarnings.removeAll(cancelWarnings);
-        this.delayWarnings.removeAll(cancelWarnings1);
+            System.out.println(String.format("delayWarnings %s/%s", this.delayWarnings.size(), cancelWarnings.size()));
+            this.delayWarnings.removeAll(cancelWarnings);
+            this.delayWarnings.removeAll(cancelWarnings1);
 
-        System.out.println(String.format("delayWarnings * %s", this.delayWarnings.size()));
+            System.out.println(String.format("delayWarnings * %s", this.delayWarnings.size()));
 
 
-        totalWarnings.stream().filter(warningData -> {
-            return  !cancelableWarningMap.keySet().stream().map(warning -> {
-                return warning.content;
-            }).collect(Collectors.toList()).contains(warningData.warning.content);
+            totalWarnings.stream().filter(warningData -> {
+                return  !cancelableWarningMap.keySet().stream().map(warning -> {
+                    return warning.content;
+                }).collect(Collectors.toList()).contains(warningData.warning.content);
 
-        }).forEach(warningData -> {
-            if (warningData.warning.delayTime >= 0.3) {
-                cancelableWarningMap.put(warningData.warning, warningTimer(warningData));
-            }
-        });
+            }).forEach(warningData -> {
+                if (warningData.warning.delayTime >= 0.3) {
+                    cancelableWarningMap.put(warningData.warning, warningTimer(warningData));
+                }
+            });
+        }
+
+
+
 
     }
 
