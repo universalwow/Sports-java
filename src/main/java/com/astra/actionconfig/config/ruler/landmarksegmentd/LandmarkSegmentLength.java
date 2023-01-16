@@ -27,9 +27,15 @@ public class LandmarkSegmentLength {
     public boolean satisfy(Map<LandmarkType, Point3F> poseMap) {
         LandmarkSegment fromSegment =
                 this.from.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+
+
+
         LandmarkSegment toSegment =
                 this.to.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
 
+        if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+            return false;
+        }
         return ComplexRule.satisfyWithDirection(from.axis, to.axis, this.range(), fromSegment, toSegment);
     }
 

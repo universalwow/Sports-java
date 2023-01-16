@@ -631,7 +631,7 @@ public class Sporter {
     double lastTime = 0;
 
     private void updateWarnings(double currentTime, Set<Warning> allCurrentFrameWarnings){
-        synchronized (cancelableWarningMap) {
+        synchronized (delayWarnings) {
             allCurrentFrameWarnings.forEach(warning -> {
                 if (warning.delayTime < 0.3) {
                     noDelayWarnings.add(warning);

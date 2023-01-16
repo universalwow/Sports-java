@@ -113,6 +113,9 @@ public enum LandmarkType {
             poseMap.put(landmarkType, new Point3F(landmarks.get(i).get("x"),
                     landmarks.get(i).get("y"),
                     landmarks.get(i).get("z")));
+            if (landmarkType == LandmarkType.LeftShoulder || landmarkType == LandmarkType.RightShoulder) {
+                System.out.println(String.format("landmark %s -> %s/%s", landmarkType, landmarks.get(i).get("x"),landmarks.get(i).get("y")));
+            }
         }
 
         return poseMap;

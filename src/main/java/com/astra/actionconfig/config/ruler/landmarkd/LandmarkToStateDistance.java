@@ -38,6 +38,7 @@ public class LandmarkToStateDistance {
         if (toStateTimes.size() > 0) {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             Landmark fromLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(poseMap);
+
             Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F(0.,0.,0.));
 
             if (isRelativeToExtremeDirection) {
@@ -50,6 +51,7 @@ public class LandmarkToStateDistance {
 
                         break;
                     case MaxX:
+
                         toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX;
 
                         break;
@@ -84,8 +86,14 @@ public class LandmarkToStateDistance {
             }
 
             LandmarkSegment fromSegment = new LandmarkSegment(fromLandmark, toLandmark);
+            System.out.println(String.format("maxX %s/%s", fromLandmark.position.x, fromLandmark.position.y));
+            System.out.println(String.format("maxX %s/%s", toLandmark.position.x, toLandmark.position.y));
+
             LandmarkSegment toSegment = this.toLandmarkSegmentToAxis.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
 
+            if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+                return false;
+            }
             return ComplexRule.satisfyWithDirection(fromLandmarkToAxis.axis, toLandmarkSegmentToAxis.axis, this.range(), fromSegment, toSegment);
         }else {
 //            System.out.println(String.format("defaultSatisfy %s", defaultSatisfy));

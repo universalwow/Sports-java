@@ -41,6 +41,7 @@ public class LandmarkSegmentToStateDistance {
         if (toStateTimes.size() > 0) {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             LandmarkSegment fromSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+
             LandmarkSegment toSegment = new LandmarkSegment(
                     new Landmark(fromSegment.startLandmark.landmarkType, new Point3F(0.,0.,0.)),
                     new Landmark(fromSegment.endLandmark.landmarkType, new Point3F(0.,0.,0.))
@@ -110,6 +111,12 @@ public class LandmarkSegmentToStateDistance {
             }else {
                 toSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(toStateTime.poseMap);
             }
+
+
+            if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+                return false;
+            }
+
             Range<Double> range = range();
 
             return ComplexRule.satisfyWithDirection2(fromAxis, fromAxis, range, fromSegment, toSegment);

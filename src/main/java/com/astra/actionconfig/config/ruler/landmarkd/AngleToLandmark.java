@@ -35,6 +35,10 @@ public class AngleToLandmark {
     public boolean satisfy(Map<LandmarkType, Point3F> poseMap) {
         Range<Double> range = this.range();
         LandmarkSegment segment = this.landmarkSegment().landmarkTypeSegment().landmarkSegment(poseMap);
+        if (segment.isEmpty()) {
+            return false;
+        }
+
         return range.contains(segment.angle()) || range.contains(segment.angle() + 360);
     }
 

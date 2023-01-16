@@ -55,6 +55,11 @@ public class LandmarkInArea {
 
     public boolean satisfy(Map<LandmarkType, Point3F> poseMap, Point2F frameSize) {
         Point3F landmarkPoint = poseMap.get(landmark.landmarkType);
+
+        if (landmarkPoint.isEmpty()) {
+            return false;
+        }
+
         Point2F[] path = this.path(frameSize);
         System.out.println(Arrays.stream(path).map(Object::toString).toArray(String[]::new));
 

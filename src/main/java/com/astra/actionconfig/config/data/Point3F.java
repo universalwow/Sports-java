@@ -24,6 +24,13 @@ public class Point3F {
         return new Point2F(this.x, this.y);
     }
 
+    public boolean isEmpty() {
+        if (this.x < 0.001 && this.y < 0.001) {
+            return true;
+        }
+        return false;
+    }
+
     public Vector2D vector2D() {
         return new Vector2D(this.x, this.y);
     }

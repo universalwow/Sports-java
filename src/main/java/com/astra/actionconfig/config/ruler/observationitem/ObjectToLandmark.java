@@ -41,8 +41,14 @@ public class ObjectToLandmark {
                 ),
                 toLandmark
         );
+
+
         LandmarkSegment toSegment = toLandmarkSegmentToAxis.landmarkSegment.
                 landmarkTypeSegment().landmarkSegment(poseMap);
+
+        if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+            return  false;
+        }
 
         if (isRelativeToObject) {
             return ComplexRule.satisfyWithDirectionToObject(

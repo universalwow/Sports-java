@@ -20,4 +20,14 @@ public class Landmark {
     }
 
 
+    public boolean isEmpty() {
+        if (this.position.x < 0.001 && this.position.y < 0.001) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+
 }

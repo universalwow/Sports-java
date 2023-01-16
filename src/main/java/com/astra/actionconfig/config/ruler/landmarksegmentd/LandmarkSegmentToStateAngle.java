@@ -42,6 +42,8 @@ public class LandmarkSegmentToStateAngle {
         if (toStateTimes.size() > 0) {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             LandmarkSegment fromSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+
+
             LandmarkSegment toSegment = new LandmarkSegment(
                     new Landmark(fromSegment.startLandmark.landmarkType, new Point3F()),
                     new Landmark(fromSegment.endLandmark.landmarkType, new Point3F())
@@ -110,6 +112,10 @@ public class LandmarkSegmentToStateAngle {
 
             }else {
                 toSegment = this.toLandmarkSegment.landmarkTypeSegment().landmarkSegment(toStateTime.poseMap);
+            }
+
+            if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+                return false;
             }
 
             double angle = fromSegment.angle() - toSegment.angle();

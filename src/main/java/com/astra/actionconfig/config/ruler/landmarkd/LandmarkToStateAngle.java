@@ -90,6 +90,10 @@ public class LandmarkToStateAngle {
 
             LandmarkSegment fromSegment = new LandmarkSegment(toLandmark, fromLandmark);
 
+            if (fromSegment.isEmpty()) {
+                return false;
+            }
+
             return range().contains(fromSegment.angle());
         }else {
             return true;

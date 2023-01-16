@@ -125,6 +125,10 @@ public class ObjectToStateAngle {
                     new Landmark(LandmarkType.None, fromObjectPoint)
             );
 
+            if (landmarkSegment.isEmpty()) {
+                return false;
+            }
+
             double angle = landmarkSegment.angle();
             Range<Double> range = range();
             return range.contains(angle) || range.contains(angle + 360);

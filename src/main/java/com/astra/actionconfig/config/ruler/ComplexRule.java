@@ -16,6 +16,7 @@ public class ComplexRule {
         if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.X)) {
             satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceX());
         } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.Y)) {
+            System.out.println(String.format("distance %s/%s -> %s/%s", range.getMinimum(), range.getMaximum(), fromSegment.distanceXWithDirection(), toSegment.distanceY()));
             satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceY());
         } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.XY)) {
             satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distance());

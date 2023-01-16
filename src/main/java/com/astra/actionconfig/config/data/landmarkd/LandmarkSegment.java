@@ -29,6 +29,14 @@ public class LandmarkSegment {
         return new LandmarkTypeSegment(startLandmark.landmarkType, endLandmark.landmarkType);
     }
 
+    public boolean isEmpty() {
+        if (startLandmark.isEmpty() || endLandmark.isEmpty()) {
+            return true;
+        }
+        return  false;
+
+    }
+
     public double angle() {
         return Vector2D.minus(endLandmark.position.vector2D(), startLandmark.position.vector2D()).oppositeY().angle();
     }
