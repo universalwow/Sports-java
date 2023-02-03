@@ -39,57 +39,57 @@ public class LandmarkToStateDistance {
             StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
             Landmark fromLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(poseMap);
 
-            Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F(0.,0.,0.));
+            Landmark toLandmark = new Landmark(toLandmarkToAxis.landmark.landmarkType, new Point3F(0.,0.,0.));
 
             if (isRelativeToExtremeDirection) {
                 switch (extremeDirection) {
                     case MinX:
-                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX;
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX;
                         break;
                     case MinY:
-                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY;
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY;
 
                         break;
                     case MaxX:
 
-                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX;
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX;
 
                         break;
                     case MaxY:
-                        toLandmark.position = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY;
+                        toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY;
                         System.out.println(String.format("max y %s/%s", toLandmark.position.x, toLandmark.position.y));
                         break;
                     case MinX_MinY:
-                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX.x;
-                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY.y;
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY.y;
 
                         break;
                     case MinX_MaxY:
-                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minX.x;
-                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY.y;
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY.y;
 
                         break;
                     case MaxX_MinY:
-                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX.x;
-                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).minY.y;
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY.y;
 
                         break;
                     case MaxX_MaxY:
-                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxX.x;
-                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(fromLandmark.landmarkType).maxY.y;
+                        toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX.x;
+                        toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY.y;
 
                         break;
                 }
 
             }else {
-                toLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(toStateTime.poseMap);
+                toLandmark = toLandmark.landmarkType.landmark(toStateTime.poseMap);
             }
 
             LandmarkSegment fromSegment = new LandmarkSegment(fromLandmark, toLandmark);
             System.out.println(String.format("maxX %s/%s", fromLandmark.position.x, fromLandmark.position.y));
             System.out.println(String.format("maxX %s/%s", toLandmark.position.x, toLandmark.position.y));
 
-            LandmarkSegment toSegment = this.toLandmarkSegmentToAxis.landmarkSegment.landmarkTypeSegment().landmarkSegment(poseMap);
+            LandmarkSegment toSegment = ComplexRule.initLandmarkSegment(isRelativeToExtremeDirection, extremeDirection, toLandmarkSegmentToAxis.landmarkSegment, toStateTime);
 
             if (fromSegment.isEmpty() || toSegment.isEmpty()) {
                 return false;
