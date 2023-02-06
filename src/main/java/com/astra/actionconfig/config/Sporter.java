@@ -335,8 +335,17 @@ public class Sporter {
                                     new ScoreTime(currentStateTime.stateId, currentStateTime.time,true, currentStateTime.poseMap, currentStateTime.object)
                             );
                             scoreTimesSetted();
-                        } else {
-                            scoreTimes.addAll(timerScoreTimes);
+                        } else if (Lists.newArrayList(SportClass.Timer, SportClass.TimeCounter).contains(sport.sportClass)) {
+                            SportState state = sport.findFirstStateByStateId(currentStateTime.stateId).get();
+                            boolean isTimer = state.timeCounterIsTimer.get();
+                            if (!isTimer){
+                                scoreTimes.add(
+                                        new ScoreTime(currentStateTime.stateId, currentStateTime.time,true, currentStateTime.poseMap, currentStateTime.object)
+                                );
+                            }else {
+                                scoreTimes.addAll(timerScoreTimes);
+                            }
+
                             scoreTimesSetted();
                         }
                     }
@@ -988,6 +997,13 @@ public class Sporter {
 
         Set<Warning> allCurrentFrameWarnings = new HashSet<>();
 
+        if (currentStateTime.time > 1 && currentTime - currentStateTime.time > sport.scoreTimeLimit) {
+            currentStateTime = new StateTime(SportState.startState().id, currentTime, poseMap, Optional.empty());
+            currentStateTimeSetted();
+
+            allCurrentFrameWarnings.add(new Warning("状态变换间隔太久", true, 0));
+        }
+
         List<SportStateTransform> transforms = sport.stateTransForm.stream().filter(transform -> currentStateTime.stateId == transform.from).collect(Collectors.toList());
         List<RuleSatisfyData> violateRulesTransformSatisfy = transforms.stream().map( transform -> {
             Optional<SportState> toState = sport.findFirstStateByStateId(transform.to);
@@ -1043,19 +1059,27 @@ public class Sporter {
             if (!toState.equals(Optional.empty()) && transform.from == currentStateTime.stateId) {
                 nextState = toState.get();
                 RuleSatisfyData satisfy = toState.get().rulesSatisfy(RuleType.SCORE, stateTimeHistory, poseMap, objects, frameSize);
+                boolean isTimer = toState.get().timeCounterIsTimer.get();
+                if (isTimer) {
+                    if (satisfy.satisfy) {
 
-                if (satisfy.satisfy) {
-
-                    if (!inCheckingStatesTimer.containsKey(toState.get().name)){
-                        inCheckingStatesTimer.put(toState.get().name, checkStateTimer(toState.get(), currentTime, toState.get().checkCycle, poseMap, null));
+                        if (!inCheckingStatesTimer.containsKey(toState.get().name)){
+                            inCheckingStatesTimer.put(toState.get().name, checkStateTimer(toState.get(), currentTime, toState.get().checkCycle, poseMap, null));
+                        }
                     }
-                }
 
-                if (inCheckingStatesTimer.containsKey(toState.get().name)) {
-                    if (inCheckingStateHistory.containsKey(toState.get().name)) {
-                        inCheckingStateHistory.get(toState.get().name).add(satisfy.satisfy);
-                    }else{
-                        inCheckingStateHistory.put(toState.get().name, Lists.newArrayList(satisfy.satisfy));
+                    if (inCheckingStatesTimer.containsKey(toState.get().name)) {
+                        if (inCheckingStateHistory.containsKey(toState.get().name)) {
+                            inCheckingStateHistory.get(toState.get().name).add(satisfy.satisfy);
+                        }else{
+                            inCheckingStateHistory.put(toState.get().name, Lists.newArrayList(satisfy.satisfy));
+                        }
+                    }
+
+                }else {
+                    if (satisfy.satisfy) {
+                        currentStateTime = new StateTime(toState.get().id, currentTime, poseMap, Optional.empty());
+                        currentStateTimeSetted();
                     }
                 }
 

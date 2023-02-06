@@ -34,6 +34,8 @@ public class SportState {
     //下面两个没有数据
     public List<Rules> violateRules = Lists.newArrayList();
 
+    public Optional<Boolean> timeCounterIsTimer = Optional.of(true);
+
     public SportState(int id, String name, String description) {
         this.id = id;
         this.name = name;
