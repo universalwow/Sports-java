@@ -147,7 +147,7 @@ public class ObjectToStateDistance {
                     this.range(),
                     fromSegment,
                     toSegment
-            );
+            ).satisfy;
 
         }else {
             return true;

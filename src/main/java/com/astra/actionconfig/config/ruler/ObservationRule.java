@@ -43,9 +43,14 @@ public class ObservationRule {
                                 0, 0),
                         (result, next) -> {
                             boolean satisfy = false;
+                            if (objects.size() > 0) {
+                                System.out.println(String.format("-------------------%s - %s", objects.get(0).label == next.fromPosition.id, next.fromPosition.id));
 
-                            Optional<Observation> selectedObject = objects.stream()
-                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                            }
+
+                            Optional<Observation> selectedObject = objects.stream().
+                                    filter(object -> object.label.equals(next.fromPosition.id)).findFirst();
+                            System.out.println(String.format("-------------------%s - %s", selectedObject, next.fromPosition.id));
                             if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(poseMap, selectedObject.get());
                             }
@@ -77,9 +82,9 @@ public class ObservationRule {
                             boolean satisfy = false;
 
                             Optional<Observation> selectedFromObject = objects.stream()
-                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                                    .filter(object -> object.label.equals(next.fromPosition.id)).findFirst();
                             Optional<Observation> selectedToObject = objects.stream()
-                                    .filter(object -> object.label == next.toPosition.id).findFirst();
+                                    .filter(object -> object.label.equals(next.toPosition.id)).findFirst();
 
                             if (!selectedFromObject.equals(Optional.empty()) && !selectedToObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(poseMap, selectedFromObject.get(), selectedToObject.get());
@@ -112,7 +117,7 @@ public class ObservationRule {
                             boolean satisfy = false;
 
                             Optional<Observation> selectedObject = objects.stream()
-                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                                    .filter(object -> object.label.equals(next.fromPosition.id)).findFirst();
                             if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
                             }
@@ -144,7 +149,7 @@ public class ObservationRule {
                             boolean satisfy = false;
 
                             Optional<Observation> selectedObject = objects.stream()
-                                    .filter(object -> object.label == next.fromPosition.id).findFirst();
+                                    .filter(object -> object.label.equals(next.fromPosition.id)).findFirst();
                             if (!selectedObject.equals(Optional.empty())) {
                                 satisfy = next.satisfy(stateTimeHistory, poseMap, selectedObject.get());
                             }

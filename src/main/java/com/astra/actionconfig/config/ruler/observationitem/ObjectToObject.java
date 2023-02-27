@@ -59,7 +59,7 @@ public class ObjectToObject {
                 this.range(),
                 fromSegment,
                 toSegment
-        );
+        ).satisfy;
     }
 
 

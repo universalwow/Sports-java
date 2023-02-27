@@ -47,7 +47,7 @@ public class Sport implements Serializable {
 
 
     //下面是计分相关的设置
-    public int scoreTimeLimit = 2; //
+    public double scoreTimeLimit = 2; //
     public List<List<Integer>> scoreStateSequence = Lists.newArrayList();; // 含义待定
 
     //下面是状态的定义

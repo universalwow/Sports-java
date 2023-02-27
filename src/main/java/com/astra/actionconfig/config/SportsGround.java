@@ -15,15 +15,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SportsGround {
     private static SportsGround ground;
     public List<Sporter> sporters = Lists.newArrayList();
     public List<Warning> warnings = Lists.newArrayList();
+    public Optional<Map<LandmarkType, Point3F>> lastPoseMap = Optional.empty();
 
 
     public void clearWarnings() {
@@ -71,8 +69,11 @@ public class SportsGround {
         warnings.clear();
         for (int i = 0; i < sporters.size(); i++) {
             Sporter sporter = sporters.get(i);
-
-            sporter.play(poseMap, objects, frameSize, currentTime);
+            if (lastPoseMap.equals(Optional.empty())) {
+                lastPoseMap = Optional.of(poseMap);
+            }
+            sporter.play(poseMap, lastPoseMap.get(), objects, frameSize, currentTime);
+            lastPoseMap = Optional.of(poseMap);
             sporter.delayWarnings.forEach(warning -> {
                         if (!warnings.contains(warning)) {
                             warnings.add((Warning) warning);

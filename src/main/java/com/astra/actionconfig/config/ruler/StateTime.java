@@ -18,25 +18,28 @@ public class StateTime {
     public Optional<Observation> object;
     public Map<String, ExtremeObject> dynamicObjectsMaps = new HashMap<>();
     public Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps = new EnumMap<LandmarkType, ExtremePoint3D>(LandmarkType.class);
+    public boolean isDirectedTo = false;
 
 
     public StateTime(int stateId, double time, Map<LandmarkType, Point3F> poseMap,
-                     Optional<Observation> object) {
+                     Optional<Observation> object, boolean isDirectedTo) {
         this.stateId = stateId;
         this.time = time;
         this.poseMap = poseMap;
         this.object = object;
+        this.isDirectedTo = isDirectedTo;
 
     }
 
     public StateTime(int stateId, double time, Map<LandmarkType, Point3F> poseMap,
-                     Optional<Observation> object, Map<String, ExtremeObject> dynamicObjectsMaps, Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps) {
+                     Optional<Observation> object, Map<String, ExtremeObject> dynamicObjectsMaps, Map<LandmarkType, ExtremePoint3D> dynamicPoseMaps, boolean isDirectedTo) {
         this.stateId = stateId;
         this.time = time;
         this.poseMap = poseMap;
         this.object = object;
         this.dynamicObjectsMaps = dynamicObjectsMaps;
         this.dynamicPoseMaps = dynamicPoseMaps;
+        this.isDirectedTo = isDirectedTo;
 
     }
 }

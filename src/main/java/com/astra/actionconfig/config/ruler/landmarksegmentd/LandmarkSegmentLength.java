@@ -36,7 +36,7 @@ public class LandmarkSegmentLength {
         if (fromSegment.isEmpty() || toSegment.isEmpty()) {
             return false;
         }
-        return ComplexRule.satisfyWithDirection(from.axis, to.axis, this.range(), fromSegment, toSegment);
+        return ComplexRule.satisfyWithDirection(from.axis, to.axis, this.range(), fromSegment, toSegment).satisfy;
     }
 
 

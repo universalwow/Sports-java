@@ -4,11 +4,64 @@ import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.landmarkd.CoordinateAxis;
 import com.astra.actionconfig.config.data.landmarkd.Landmark;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
+import com.astra.actionconfig.config.ruler.landmarkd.SatisfyScore;
 import com.astra.actionconfig.config.ruler.observationitem.ExtremeDirection;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang3.Range;
 
 public class ComplexRule {
+
+    public static Landmark initLandmark(boolean isRelativeToExtremeDirection, ExtremeDirection extremeDirection, Landmark fromLandmark,
+                                        StateTime toStateTime) {
+
+        Landmark toLandmark = new Landmark(fromLandmark.landmarkType, new Point3F(0.,0.,0.));
+
+        if (isRelativeToExtremeDirection) {
+            switch (extremeDirection) {
+                case MinX:
+                    toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX;
+                    break;
+                case MinY:
+                    toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY;
+
+                    break;
+                case MaxX:
+
+                    toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX;
+
+                    break;
+                case MaxY:
+                    toLandmark.position = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY;
+                    System.out.println(String.format("max y %s/%s", toLandmark.position.x, toLandmark.position.y));
+                    break;
+                case MinX_MinY:
+                    toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX.x;
+                    toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY.y;
+
+                    break;
+                case MinX_MaxY:
+                    toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minX.x;
+                    toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY.y;
+
+                    break;
+                case MaxX_MinY:
+                    toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX.x;
+                    toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).minY.y;
+
+                    break;
+                case MaxX_MaxY:
+                    toLandmark.position.x = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxX.x;
+                    toLandmark.position.y = toStateTime.dynamicPoseMaps.get(toLandmark.landmarkType).maxY.y;
+
+                    break;
+            }
+
+        }else {
+            toLandmark = toLandmark.landmarkType.landmark(toStateTime.poseMap);
+        }
+
+        return toLandmark;
+    }
 
     public static LandmarkSegment initLandmarkSegment(boolean isRelativeToExtremeDirection, ExtremeDirection extremeDirection,
                                                       LandmarkSegment fromLandmarkSegment, StateTime toStateTime) {
@@ -86,44 +139,44 @@ public class ComplexRule {
 
     }
 
-    public static boolean satisfyWithDirection(
+    public static double initBound(CoordinateAxis fromAxis, CoordinateAxis toAxis, LandmarkSegment fromSegment, LandmarkSegment toSegment) {
+        double ratio = 0.0;
+        if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.X)) {
+            ratio = fromSegment.distanceXWithDirection() / toSegment.distanceX();
+        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.Y)) {
+
+            ratio = fromSegment.distanceXWithDirection() / toSegment.distanceY();
+        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.XY)) {
+            ratio = fromSegment.distanceXWithDirection() / toSegment.distance();
+
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.X)) {
+            ratio = fromSegment.distanceYWithDirection() / toSegment.distanceX();
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.Y)) {
+            ratio = fromSegment.distanceYWithDirection() / toSegment.distanceY();
+        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.XY)) {
+            ratio = fromSegment.distanceYWithDirection() / toSegment.distance();
+
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.X)) {
+            ratio = fromSegment.distance() / toSegment.distanceX();
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.Y)) {
+            ratio = fromSegment.distance() / toSegment.distanceY();
+        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.XY)) {
+            ratio = fromSegment.distance() / toSegment.distance();
+        }
+        return ratio;
+    }
+
+    public static SatisfyScore satisfyWithDirection(
             CoordinateAxis fromAxis,
             CoordinateAxis toAxis,
             Range<Double> range,
             LandmarkSegment fromSegment,
             LandmarkSegment toSegment
     ) {
-        boolean satisfy = false;
-        if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.X)) {
-            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceX());
-        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.Y)) {
-            System.out.println(String.format("distance - %s/%s -> %s/%s landmark %s %s/%s; landmark %s %s/%s",
-                    range.getMinimum(), range.getMaximum(), fromSegment.distanceXWithDirection(), toSegment.distanceY(),
-                    fromSegment.startLandmark.landmarkType, fromSegment.startLandmark.position.x, fromSegment.startLandmark.position.y,
-                    fromSegment.endLandmark.landmarkType, fromSegment.endLandmark.position.x, fromSegment.endLandmark.position.y
-            ));
-            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distanceY());
-        } else if (fromAxis.equals(CoordinateAxis.X) && toAxis.equals(CoordinateAxis.XY)) {
-            satisfy = range.contains(fromSegment.distanceXWithDirection() / toSegment.distance());
 
-        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.X)) {
-            System.out.println(String.format("distance %s/%s -> %s/%s", range.getMinimum(), range.getMaximum(), fromSegment.distanceYWithDirection(), toSegment.distanceX()));
-            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distanceX());
-        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.Y)) {
-            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distanceY());
-        } else if (fromAxis.equals(CoordinateAxis.Y) && toAxis.equals(CoordinateAxis.XY)) {
-            satisfy = range.contains(fromSegment.distanceYWithDirection() / toSegment.distance());
+        double ratio = initBound(fromAxis, toAxis, fromSegment, toSegment);
 
-        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.X)) {
-            satisfy = range.contains(fromSegment.distance() / toSegment.distanceX());
-        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.Y)) {
-            satisfy = range.contains(fromSegment.distance() / toSegment.distanceY());
-        } else if (fromAxis.equals(CoordinateAxis.XY) && toAxis.equals(CoordinateAxis.XY)) {
-            satisfy = range.contains(fromSegment.distance() / toSegment.distance());
-        }
-
-
-        return satisfy;
+        return new SatisfyScore(range.contains(ratio), ratio);
     }
 
     public static boolean satisfyWithDirection2(

@@ -5,17 +5,11 @@ import com.astra.actionconfig.config.data.Point2F;
 import com.astra.actionconfig.config.data.Point3F;
 import com.astra.actionconfig.config.data.Warning;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
-import com.astra.actionconfig.config.ruler.landmarkd.AngleToLandmark;
-import com.astra.actionconfig.config.ruler.landmarkd.DistanceToLandmark;
-import com.astra.actionconfig.config.ruler.landmarkd.LandmarkToStateAngle;
-import com.astra.actionconfig.config.ruler.landmarkd.LandmarkToStateDistance;
+import com.astra.actionconfig.config.ruler.landmarkd.*;
 import com.google.common.collect.Lists;
 import lombok.Data;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @Data
@@ -152,6 +146,98 @@ public class LandmarkRule {
                         angleToLandmarkSatisfies.total +
                         landmarkToStateDistanceSatisfies.total +
                         landmarkToStateAngleSatisfies.total);
+    }
+
+    public RuleSatisfyData allSatisfyWithRatio(List<StateTime> stateTimeHistory,
+                                      Map<LandmarkType, Point3F> poseMap,
+                                      List<Observation> objects,
+                                      Point2F frameSize) {
+
+        RuleSatisfyData landmarkToStateDistanceSatisfies =
+                landmarkToStateDistance.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0, new ArrayList<>()),
+                        (result, next) -> {
+                            SatisfyScore satisfyScore = next.satisfyWithRatio(stateTimeHistory, poseMap);
+                            Set<Warning> newWarnings = result.warnings;
+                            List<Double> scores = result.scores;
+
+
+                            if (next.warning.triggeredWhenRuleMet && satisfyScore.satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfyScore.satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+                            scores.add(satisfyScore.score);
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfyScore.satisfy,
+                                    newWarnings,
+                                    satisfyScore.satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1, scores
+                            );
+                        }, (a, b) -> null
+
+                );
+
+
+        Set<Warning> warnings = new HashSet<>();
+
+        warnings.addAll(landmarkToStateDistanceSatisfies.warnings);
+        return new RuleSatisfyData(
+
+                        landmarkToStateDistanceSatisfies.satisfy,
+                warnings,
+
+                        landmarkToStateDistanceSatisfies.pass,
+
+                        landmarkToStateDistanceSatisfies.total, landmarkToStateDistanceSatisfies.scores);
+    }
+
+    public RuleSatisfyData allSatisfyWithWeight(List<StateTime> stateTimeHistory,
+                                               Map<LandmarkType, Point3F> poseMap, Map<LandmarkType, Point3F> lastPoseMap,
+                                               List<Observation> objects,
+                                               Point2F frameSize) {
+
+        RuleSatisfyData landmarkToStateDistanceSatisfies =
+                landmarkToStateDistance.stream().reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0, new ArrayList<>()),
+                        (result, next) -> {
+                            SatisfyScore satisfyScore = next.satisfyWithWeight(stateTimeHistory, poseMap, lastPoseMap);
+                            Set<Warning> newWarnings = result.warnings;
+                            List<Double> scores = result.scores;
+
+
+                            if (next.warning.triggeredWhenRuleMet && satisfyScore.satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfyScore.satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+                            scores.add(satisfyScore.score);
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfyScore.satisfy,
+                                    newWarnings,
+                                    satisfyScore.satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1, scores
+                            );
+                        }, (a, b) -> null
+
+                );
+
+
+        Set<Warning> warnings = new HashSet<>();
+
+        warnings.addAll(landmarkToStateDistanceSatisfies.warnings);
+        return new RuleSatisfyData(
+
+                landmarkToStateDistanceSatisfies.satisfy,
+                warnings,
+
+                landmarkToStateDistanceSatisfies.pass,
+
+                landmarkToStateDistanceSatisfies.total, landmarkToStateDistanceSatisfies.scores);
     }
 
 
