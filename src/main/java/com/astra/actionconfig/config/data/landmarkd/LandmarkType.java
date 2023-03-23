@@ -106,6 +106,81 @@ public enum LandmarkType {
         }
     }
 
+
+    public static int landmarkTypeToIndex(LandmarkType landmarkType) {
+        switch (landmarkType) {
+            case Nose:
+                return 0;
+            case RightEyeInner:
+                return 1;
+            case RightEye:
+                return 2;
+            case RightEyeOuter:
+                return 3;
+            case LeftEyeInner:
+                return 4;
+            case LeftEye:
+                return 5;
+            case LeftEyeOuter:
+                return 6;
+            case RightEar:
+                return 7;
+            case LeftEar:
+                return 8;
+            case MouthRight:
+                return 9;
+            case MouthLeft:
+                return 10;
+            case RightShoulder:
+                return 11;
+            case LeftShoulder:
+                return 12;
+            case RightElbow:
+                return 13;
+            case LeftElbow:
+                return 14;
+            case RightWrist:
+                return 15;
+            case LeftWrist:
+                return 16;
+            case RightPinkyFinger:
+                return 17;
+            case LeftPinkyFinger:
+                return 18;
+            case RightIndexFinger:
+                return 19;
+            case LeftIndexFinger:
+                return 20;
+            case RightThumb:
+                return 21;
+            case LeftThumb:
+                return 22;
+            case RightHip:
+                return 23;
+
+            case LeftHip:
+                return 24;
+            case RightKnee:
+                return 25;
+            case LeftKnee:
+                return 26;
+            case RightAnkle:
+                return 27;
+            case LeftAnkle:
+                return 28;
+            case RightHeel:
+                return 29;
+            case LeftHeel:
+                return 30;
+            case RightToe:
+                return 31;
+            case LeftToe:
+                return 32;
+            default:
+                return 33;
+        }
+    }
+
     public static Map<LandmarkType, Point3F> poseMap(List<Map<String,Double>> landmarks) {
         Map<LandmarkType, Point3F> poseMap = new EnumMap<LandmarkType, Point3F>(LandmarkType.class);
         for (int i = 0; i < landmarks.size(); i++) {
