@@ -25,6 +25,7 @@ public class LandmarkRule {
 
     public RuleSatisfyData allSatisfy(List<StateTime> stateTimeHistory,
                                       Map<LandmarkType, Point3F> poseMap,
+                                      Map<LandmarkType, Point3F> lastPoseMap,
                                       List<Observation> objects,
                                       Point2F frameSize) {
         RuleSatisfyData distanceToLandmarkSatisfies =
@@ -78,7 +79,12 @@ public class LandmarkRule {
                 );
 
         RuleSatisfyData landmarkToStateDistanceSatisfies =
-                landmarkToStateDistance.stream().reduce(
+                landmarkToStateDistance.stream().filter(
+                        rule -> {
+                            return rule.toStateToggle.orElse(false);
+                        }
+
+                ).reduce(
                         new RuleSatisfyData(true,
                                 new HashSet<>(),
                                 0, 0),
@@ -101,6 +107,38 @@ public class LandmarkRule {
                         }, (a, b) -> null
 
                 );
+
+        RuleSatisfyData landmarkToLastFrameDistanceSatisfies =
+                landmarkToStateDistance.stream().filter(
+                        rule -> {
+                            return rule.toLastFrameToggle.orElse(false);
+                        }
+
+                ).reduce(
+                        new RuleSatisfyData(true,
+                                new HashSet<>(),
+                                0, 0),
+                        (result, next) -> {
+                            SatisfyScore satisfy = next.satisfyWithRatio2(stateTimeHistory, poseMap, lastPoseMap);
+                            Set<Warning> newWarnings = result.warnings;
+
+                            if (next.warning.triggeredWhenRuleMet && satisfy.satisfy) {
+                                newWarnings.add(next.warning);
+                            }else if (!next.warning.triggeredWhenRuleMet && !satisfy.satisfy) {
+                                newWarnings.add(next.warning);
+                            }
+
+                            return new RuleSatisfyData(
+                                    result.satisfy && satisfy.satisfy,
+                                    newWarnings,
+                                    satisfy.satisfy ? result.pass + 1 : result.pass,
+                                    result.total + 1
+                            );
+                        }, (a, b) -> null
+
+                );
+
+
 
         RuleSatisfyData landmarkToStateAngleSatisfies =
                 landmarkToStateAngle.stream().reduce(
@@ -131,20 +169,24 @@ public class LandmarkRule {
         warnings.addAll(distanceToLandmarkSatisfies.warnings);
         warnings.addAll(angleToLandmarkSatisfies.warnings);
         warnings.addAll(landmarkToStateDistanceSatisfies.warnings);
+        warnings.addAll(landmarkToLastFrameDistanceSatisfies.warnings);
         warnings.addAll(landmarkToStateAngleSatisfies.warnings);
         return new RuleSatisfyData(
                 distanceToLandmarkSatisfies.satisfy &&
                         angleToLandmarkSatisfies.satisfy &&
                 landmarkToStateDistanceSatisfies.satisfy &&
+                        landmarkToLastFrameDistanceSatisfies.satisfy &&
                 landmarkToStateAngleSatisfies.satisfy,
                 warnings,
                 distanceToLandmarkSatisfies.pass +
                         angleToLandmarkSatisfies.pass +
                         landmarkToStateDistanceSatisfies.pass +
+                        landmarkToLastFrameDistanceSatisfies.pass +
                         landmarkToStateAngleSatisfies.pass,
                 distanceToLandmarkSatisfies.total +
                         angleToLandmarkSatisfies.total +
                         landmarkToStateDistanceSatisfies.total +
+                        landmarkToLastFrameDistanceSatisfies.total +
                         landmarkToStateAngleSatisfies.total);
     }
 

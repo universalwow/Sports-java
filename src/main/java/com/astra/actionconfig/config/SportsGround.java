@@ -9,11 +9,7 @@ import com.astra.actionconfig.config.data.landmarkd.LandmarkSegment;
 import com.astra.actionconfig.config.data.landmarkd.LandmarkType;
 import com.astra.actionconfig.utils.ConfigParseUtil;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -21,40 +17,149 @@ public class SportsGround {
     private static SportsGround ground;
     public List<Sporter> sporters = Lists.newArrayList();
     public List<Warning> warnings = Lists.newArrayList();
-    public Optional<Map<LandmarkType, Point3F>> lastPoseMap = Optional.empty();
+
+
+    public void clearScore() {
+        sporters.forEach( sporter -> {
+            sporter.clearScoreTimes();
+        });
+    }
+
+
 
 
     public void clearWarnings() {
         warnings.clear();
     }
+    /*
+    * 一.第一次进入跳绳界面 getSport 获取sport对象
+    *Stream (Sport)
+    *
+    * 一.第一次进入跳绳界面， 添加 调用addSporters
+    *
+    * params:
+    * 1.int sportSize
+    * 2.StateListener listeners
+    * 3.Sport
+    *
+    * 二. 遍历 setListener (不必)，setFilterArea (不必再调用)
+    *
+    * 1.setFilterArea
+    * params:
+    * Point2F pointLeftTop,
+    * Point2F pointRightTop,
+    * Point2F pointRightBottom,
+    * Point2F pointLeftBottom,
+    * int index
+    *
+    * 2.setListener
+    * params:
+    * StateListener listener
+    * int index
+    *
+    * 三.每个人结束以及退出跳绳界面 调用 deleteSporter
+    * params:
+    * int index
+    * 并从新调用 setListener
+    *
+    * 四: 倒计时结束清空成绩 clearScore
+    *params:
+    * index
+    *
+    * 需要补充再交流
+    *
+    * */
 
-    public void addSporter(Sport sport) {
-        Sporter sporter = new Sporter(
-                "uni", sport
-        );
-        sporters = Lists.newArrayList(sporter);
-        clearWarnings();
+
+//    public void addSporters(int size, InputStream is) {
+//        for (int i = 0; i < size; i++) {
+//            Sport sport = ConfigParseUtil.parseConfig(is, true);
+//            Sporter sporter = new Sporter(
+//                    "unknown", sport
+//            );
+//            sporters.add(sporter);
+//            clearWarnings();
+//        }
+//    }
+
+    public Sport getSport(InputStream is) {
+        Sport sport = ConfigParseUtil.parseConfig(is, true);
+        return sport;
     }
 
-    public void addSporter(String sportPath) {
-        File f = new File(sportPath);
-        InputStream is = null;
-        try {
-            is = new FileInputStream(f);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public void addSporters(int sporterSize, SportListener listener, InputStream is) {
+        for (int i = 0; i < sporterSize; i++) {
+            Sport sport = ConfigParseUtil.parseConfig(is, true);
+            Sporter sporter = new Sporter(
+                    "unknown", sport,
+                    i
+            );
+            sporter.setListener(listener);
+            sporters.add(sporter);
+            clearWarnings();
         }
-
-//        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/2F883470-0223-41E1-B7F4-AD000E5337CE_2.0.json");
-        Sport sport = ConfigParseUtil.parseConfig(is, true);
-        addSporter(sport);
     }
 
-    public void addSporter() {
-        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/2F883470-0223-41E1-B7F4-AD000E5337CE_2.0.json");
-        Sport sport = ConfigParseUtil.parseConfig(is, true);
-        addSporter(sport);
+
+
+    public void addSporters(int sporterSize, SportListener listener, Sport sport) {
+        for (int i = 0; i < sporterSize; i++) {
+            Sporter sporter = new Sporter(
+                    "unknown", sport,
+                    i
+            );
+            sporter.setListener(listener);
+            sporters.add(sporter);
+            clearWarnings();
+        }
     }
+
+
+
+
+
+
+    public void clearScore(int index) {
+        sporters.get(index).clearScoreTimes();
+    }
+//    public void setListener(StateListener listener, int index) {
+//        sporters.get(index).setListener(listener);
+//    }
+
+//    public void setFilterArea(Point2F pointLeftTop, Point2F pointRightTop, Point2F pointRightBottom, Point2F pointLeftBottom, int index) {
+//        sporters.get(index).setFilterArea(pointLeftTop, pointRightTop,pointRightBottom, pointLeftBottom);
+//    }
+
+
+    // 每个位置结束
+    public void deleteSporter(int index) {
+        sporters.get(index).clearAllTimers();
+        Sporter sporter = new Sporter(
+                "unknown", sporters.get(index).sport,
+                index
+        );
+        sporter.setListener(sporters.get(index).getmListener());
+
+        sporters.set(index, sporter);
+    }
+
+
+    private void clearTimer() {
+        sporters.forEach(sporter -> {
+            sporter.clearAllTimers();
+        });
+    }
+
+    public void deleteSporters() {
+        clearTimer();
+        sporters.clear();
+    }
+
+    public boolean isReady() {
+        return sporters.stream().findFirst().get().isReady();
+    }
+
+
 
     public double getLandmarkSegmentAngle(Map<LandmarkType, Point3F> poseMap, LandmarkType startLandmarkType, LandmarkType endLandmarkType) {
         System.out.println(poseMap.get(startLandmarkType));
@@ -64,16 +169,12 @@ public class SportsGround {
                 new Landmark(endLandmarkType, poseMap.get(endLandmarkType))).angle();
     }
 
-    public void play(Map<LandmarkType, Point3F> poseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
-
+    public void play(List<Map<LandmarkType, Point3F>> poseMaps, List<Observation> objects, Point2F frameSize, Double currentTime) {
         warnings.clear();
         for (int i = 0; i < sporters.size(); i++) {
             Sporter sporter = sporters.get(i);
-            if (lastPoseMap.equals(Optional.empty())) {
-                lastPoseMap = Optional.of(poseMap);
-            }
-            sporter.play(poseMap, lastPoseMap.get(), objects, frameSize, currentTime);
-            lastPoseMap = Optional.of(poseMap);
+
+            sporter.play(poseMaps, objects, frameSize, currentTime);
             sporter.delayWarnings.forEach(warning -> {
                         if (!warnings.contains(warning)) {
                             warnings.add((Warning) warning);
@@ -92,6 +193,8 @@ public class SportsGround {
             System.out.println(String.format("当前状态　%s", sporter.sport.findFirstStateByStateId(sporter.currentStateTime.stateId).get().name));
             System.out.println(String.format("当前提示　%s", warnings.toString()));
         }
+
+
 
     }
 

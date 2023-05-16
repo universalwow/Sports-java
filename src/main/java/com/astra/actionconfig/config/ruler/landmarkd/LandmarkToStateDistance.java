@@ -101,6 +101,38 @@ public class LandmarkToStateDistance {
 
     }
 
+    public SatisfyScore satisfyWithRatio2(List<StateTime> stateTimeHistory, Map<LandmarkType, Point3F> poseMap, Map<LandmarkType, Point3F> lastPoseMap) {
+        double score = 0.0;
+        List<StateTime> toStateTimes = stateTimeHistory.
+                stream().
+                filter(stateTime -> stateTime.stateId == this.toStateId).collect(Collectors.toList());
+        if (toStateTimes.size() > 0) {
+            StateTime toStateTime = toStateTimes.get(toStateTimes.size()-1);
+            Landmark fromLandmark = this.fromLandmarkToAxis.landmark.landmarkType.landmark(poseMap);
+
+            Landmark toLandmark = this.toLandmarkToAxis.landmark.landmarkType.landmark(lastPoseMap);
+
+            LandmarkSegment fromSegment = new LandmarkSegment(fromLandmark, toLandmark);
+            System.out.println(String.format("maxX %s/%s", fromLandmark.position.x, fromLandmark.position.y));
+            System.out.println(String.format("maxX %s/%s", toLandmark.position.x, toLandmark.position.y));
+
+            LandmarkSegment toSegment = ComplexRule.initLandmarkSegment(isRelativeToExtremeDirection, extremeDirection, toLandmarkSegmentToAxis.landmarkSegment, toStateTime);
+
+            if (fromSegment.isEmpty() || toSegment.isEmpty()) {
+                return new SatisfyScore(false, score);
+            }
+
+//            SatisfyScore satisfyScore = ComplexRule.satisfyWithDirection(fromLandmarkToAxis.axis, toLandmarkSegmentToAxis.axis, this.range(), fromSegment, toSegment);
+//            score = satisfyScore.score;
+            return ComplexRule.satisfyWithDirection(fromLandmarkToAxis.axis, toLandmarkSegmentToAxis.axis, this.range(), fromSegment, toSegment);
+        }else {
+//            System.out.println(String.format("defaultSatisfy %s", defaultSatisfy));
+            return new SatisfyScore(defaultSatisfy, score);
+        }
+
+
+    }
+
     public SatisfyScore satisfyWithWeight(List<StateTime> stateTimeHistory, Map<LandmarkType, Point3F> poseMap, Map<LandmarkType, Point3F> lastPoseMap) {
         double score = 0.0;
         List<StateTime> toStateTimes = stateTimeHistory.

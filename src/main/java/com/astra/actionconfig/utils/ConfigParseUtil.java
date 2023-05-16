@@ -8,11 +8,14 @@ import com.astra.actionconfig.config.data.PngImage;
 
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +39,7 @@ public class ConfigParseUtil {
                 sb.append((char) ch);
             }
             reader.close();
+            is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("parseConfig error, {}", ex.getMessage());
@@ -98,8 +102,20 @@ public class ConfigParseUtil {
 
     public static void main(String[] args) throws IOException {
 //        parseConfig();
-        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/12.json");
-        Sport sport = parseConfig(is, false);
-        System.out.println(11);
+//        InputStream is = ConfigParseUtil.class.getResourceAsStream("/configjson/12.json");
+//        Sport sport = parseConfig(is, false);
+//        System.out.println(11);
+        System.out.println(String.format("%s", System.getProperty("user.home")));
+        String destinationDirectory = System.getProperty("user.home") + "/uni_learn/phoenix/uni_sport/priv/static/sports_small";
+        // Get a list of all the JSON files in the source directory
+        File[] jsonFiles = new File(System.getProperty("user.home") + "/uni_learn/phoenix/uni_sport/priv/static/sports").listFiles((dir, name) -> name.endsWith(".json"));
+        // Loop through each JSON file and write it to the destination directory
+        for (File jsonFile : jsonFiles) {
+            Sport sport = parseConfig(new FileInputStream(jsonFile), false);
+            ;
+            Files.write(Paths.get(destinationDirectory + "/" + jsonFile.getName()), JSON.toJSONBytes(sport));
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.writeValue(, sport);
+        }
     }
 }

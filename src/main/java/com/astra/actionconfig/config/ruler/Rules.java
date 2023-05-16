@@ -82,7 +82,7 @@ public class Rules {
                                 new HashSet<>(),
                                 0, 0),
                         (result, next) -> {
-                            RuleSatisfyData satisfy = next.allSatisfy(stateTimeHistory ,poseMap, objects, frameSize);
+                            RuleSatisfyData satisfy = next.allSatisfy(stateTimeHistory ,poseMap, lastPoseMap, objects, frameSize);
                             Set<Warning> newWarnings = result.warnings;
                             newWarnings.addAll(satisfy.warnings);
 

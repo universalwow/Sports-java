@@ -58,11 +58,141 @@ public class Sporter {
     UUID id = UUID.randomUUID();
     public String name;
     public Sport sport;
+    public int areaId;
 
-    public Sporter(String name, Sport sport) {
+    public boolean ready = false;
+
+    Timer readyWarningTimer;
+    TimerTask task;
+
+    public Optional<Map<LandmarkType, Point3F>> lastPoseMap = Optional.empty();
+
+
+    class WarningTask extends TimerTask {
+        String warning;
+
+        public WarningTask(String warning) {
+            this.warning = warning;
+        }
+        @Override
+        public void run() {
+            System.out.println("uni - 请开始准备");
+            mListener.warning(sport.id, areaId, warning);
+        }
+    }
+
+
+
+    public TimerTask warningTask(String warning) {
+        TimerTask task = new WarningTask(warning);
+        return task;
+    }
+
+    public Timer warningTimer(TimerTask task,long delay, long period) {
+        Timer timer = new Timer();
+        timer.schedule(task, delay, period);
+        return timer;
+    }
+
+
+    SportListener getmListener() {
+        return mListener;
+    }
+
+    private SportListener mListener = new SportListener() {
+        @Override
+        public void onReady(String sportId, int areaIndex) {
+
+        }
+
+        @Override
+        public void onEnd(String sportId, int areaIndex) {
+
+        }
+
+        @Override
+        public void warning(String sportId, int areaIndex, String warning) {
+
+        }
+
+        @Override
+        public List<Point2F> initArea(String sportId, int areaIndex) {
+            return Lists.newArrayList();
+        }
+
+
+    };
+
+    public void setListener(SportListener listener) {
+
+        this.mListener = listener;
+
+        // 设置完listener 后，可以将区域设置作为回调
+
+        filterArea = this.mListener.initArea(sport.id, areaId);
+
+        ready = false;
+        task = warningTask("请开始准备");
+        readyWarningTimer = warningTimer(task, 1000, 5000);
+
+    }
+
+
+
+
+    public Sporter(String name, Sport sport, int areaId) {
         this.name = name;
         this.sport = sport;
+        this.areaId = areaId;
+    }
 
+
+
+
+
+
+    private List<Point2F> filterArea = Lists.newArrayList();
+
+    public List<Point2F> getFilterArea()  {
+        return filterArea;
+    }
+
+    public void setFilterArea(Point2F pointLeftTop, Point2F pointRightTop, Point2F pointRightBottom, Point2F pointLeftBottom) {
+        filterArea.clear();
+        filterArea.add(pointLeftTop);
+        filterArea.add(pointRightTop);
+        filterArea.add(pointRightBottom);
+        filterArea.add(pointLeftBottom);
+    }
+
+    private Optional<Map<LandmarkType, Point3F>> filterValidPose(List<Map<LandmarkType, Point3F>> poses) {
+        return poses.stream().filter(pose -> {
+            double leftX =  filterArea.get(0).x;
+            double rightX = filterArea.get(1).x;
+            double leftAnkleX = pose.get(LandmarkType.LeftAnkle).x;
+            double rightAnkleX = pose.get(LandmarkType.RightAnkle).x;
+            return (leftAnkleX >=leftX && leftAnkleX<= rightX) ||
+                    (rightAnkleX >=leftX && rightAnkleX<= rightX);
+
+        }).findFirst();
+    }
+
+
+    public void clearAllTimers() {
+        clearReadyTimer();
+        clearTimer();
+    }
+    public void clearReadyTimer() {
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+
+        if (readyWarningTimer != null) {
+            readyWarningTimer.cancel();
+            readyWarningTimer.purge();
+            readyWarningTimer = null;
+        }
     }
 
     public void clearTimer() {
@@ -76,6 +206,8 @@ public class Sporter {
             inCheckingStatesTimer.get(key).cancel();
             inCheckingStatesTimer.remove(key);
         });
+
+
     }
 
     public List<FixedArea> getFixedAreas() {
@@ -428,6 +560,10 @@ public class Sporter {
     SportState nextState = SportState.startState();
     public List<ScoreTime> scoreTimes = new ArrayList<>();
 
+    public void clearScoreTimes() {
+        scoreTimes.clear();
+    }
+
     private void scoreTimesSetted() {
         if (scoreTimes.isEmpty()) {
             return;
@@ -512,7 +648,6 @@ public class Sporter {
             this.timer.cancel();
             this.timer.purge();
             cancelableWarningMap.remove(warning.warning);
-
         }
 
     }
@@ -521,7 +656,7 @@ public class Sporter {
         Timer timer = new Timer();
         TimerTask task =new WarningTimerTask(timer, warning);
         timer.schedule(task, (long) (warning.warning.delayTime * 1000));
-        return new Timer();
+        return timer;
     }
 
     Map<String, List<Boolean>> inCheckingStateHistory = Collections.synchronizedMap( new HashMap<>());
@@ -719,27 +854,50 @@ public class Sporter {
                 }
             });
         }
-
-
-
-
     }
 
-    public void play(Map<LandmarkType, Point3F> poseMap, Map<LandmarkType, Point3F> lastPoseMap,List<Observation> objects, Point2F frameSize, Double currentTime) {
+    public void play(List<Map<LandmarkType, Point3F>> poseMaps, List<Observation> objects, Point2F frameSize, Double currentTime) {
         this.currentTime = currentTime;
+        // 没有不进行， 默认返回第一个，但有筛选条件要进入筛选，条件不满足返回
+        if (poseMaps.size() == 0 || filterArea.size() == 0) {
+            return;
+        }
+        Map<LandmarkType, Point3F> poseMap = poseMaps.get(0);
+        if (filterArea.size() == 4) {
+            Optional<Map<LandmarkType, Point3F>> optionalPose = filterValidPose(poseMaps);
+            if (optionalPose.equals(Optional.empty())) {
+                return;
+            }
+            poseMap =  optionalPose.get();
+        }
+
+        System.out.println(String.format("uni - 图像宽高 %s/%s; 左脚 -> %s/%s; 右脚 -> %s/%s", frameSize.x, frameSize.y, poseMap.get(LandmarkType.LeftAnkle).x, poseMap.get(LandmarkType.LeftAnkle).y, poseMap.get(LandmarkType.RightAnkle).x, poseMap.get(LandmarkType.RightAnkle).y));
+
+        if (lastPoseMap.equals(Optional.empty())) {
+            lastPoseMap = Optional.of(poseMap);
+        }
         switch (sport.sportClass) {
 
+
             case Counter:
-                playCounter(poseMap, lastPoseMap, objects, frameSize, currentTime);
+                playCounter(poseMap, lastPoseMap.get(), objects, frameSize, currentTime);
                 break;
             case Timer:
-                playTimer(poseMap, lastPoseMap, objects, frameSize, currentTime);
+                playTimer(poseMap, lastPoseMap.get(), objects, frameSize, currentTime);
                 break;
             case TimeCounter:
-                playTimeCounter(poseMap, lastPoseMap, objects, frameSize, currentTime);
+                playTimeCounter(poseMap, lastPoseMap.get(), objects, frameSize, currentTime);
                 break;
             case None:
                 break;
+        }
+
+        lastPoseMap = Optional.of(poseMap);
+
+        if (this.isReady() && !ready) {
+            ready = true;
+            mListener.onReady(sport.id, areaId);
+            clearReadyTimer();
         }
 
     }
@@ -998,7 +1156,7 @@ public class Sporter {
             return warning.content == "";
         });
 
-        updateWarnings(currentTime, allCurrentFrameWarnings);
+//        updateWarnings(currentTime, allCurrentFrameWarnings);
     }
 
     private void playTimeCounter(Map<LandmarkType, Point3F> poseMap, Map<LandmarkType, Point3F> lastPoseMap, List<Observation> objects, Point2F frameSize, Double currentTime) {
@@ -1018,9 +1176,9 @@ public class Sporter {
         }
 
         Set<Warning> allCurrentFrameWarnings = new HashSet<>();
-
-        if (currentStateTime.time > 1 && currentStateTime.stateId > 6 && currentTime - currentStateTime.time > sport.scoreTimeLimit) {
-            currentStateTime = new StateTime(SportState.startState().id, currentTime, poseMap, Optional.empty(), true);
+//TODO: 变换状态的时机，变换到什么状态
+        if (currentStateTime.time > 1 && currentStateTime.stateId > 6 && scoreTimes.size() > 0 && currentTime - currentStateTime.time > sport.scoreTimeLimit) {
+            currentStateTime = new StateTime(SportState.readyState().id, currentTime, poseMap, Optional.empty(), true);
             currentStateTimeSetted();
             allCurrentFrameWarnings.add(new Warning("状态变换间隔太久", true, 0));
         }
@@ -1151,7 +1309,7 @@ public class Sporter {
             return warning.content == "";
         });
 
-        updateWarnings(currentTime, allCurrentFrameWarnings);
+//        updateWarnings(currentTime, allCurrentFrameWarnings);
 
         if (currentTime > lastTime) {
             lastTime = currentTime;
